@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.Stack;
 
 /**
- * Created by Søren Palmund on 24-08-2015.
+ * Created by Sren Palmund on 24-08-2015.
  */
 public class GS {
     static class Person {
@@ -34,35 +34,47 @@ public class GS {
         Person bertha = new Person("Bertha", 2);
         Person clare = new Person("Clare", 3);
         Person xavier = new Person("Xavier", 1);
-        xavier.preferred.push(amy);
-        xavier.preferred.push(bertha);
         xavier.preferred.push(clare);
+        xavier.preferred.push(bertha);
+        xavier.preferred.push(amy);
         Person yancey = new Person("Yancey", 2);
-        yancey.preferred.push(bertha);
-        yancey.preferred.push(amy);
         yancey.preferred.push(clare);
+        yancey.preferred.push(amy);
+        yancey.preferred.push(bertha);
+        
+        
         Person zeus = new Person("Zeus", 3);
-        zeus.preferred.push(amy);
-        zeus.preferred.push(bertha);
         zeus.preferred.push(clare);
-
+        zeus.preferred.push(bertha);
+        zeus.preferred.push(amy);
+    
+    	amy.preferred.push(zeus);
+    	amy.preferred.push(xavier);
         amy.preferred.push(yancey);
-        amy.preferred.push(xavier);
-        amy.preferred.push(zeus);
         amy.doInverse();
-        bertha.preferred.push(xavier);
-        bertha.preferred.push(yancey);
+
         bertha.preferred.push(zeus);
+        bertha.preferred.push(yancey);
+        bertha.preferred.push(xavier);
         bertha.doInverse();
+
+		clare.preferred.push(zeus);
+		clare.preferred.push(yancey);
         clare.preferred.push(xavier);
-        clare.preferred.push(yancey);
-        clare.preferred.push(zeus);
         clare.doInverse();
 
         Stack<Person> freeMen = new Stack<>();
         freeMen.push(xavier);
         freeMen.push(yancey);
         freeMen.push(zeus);
+
+        System.out.println("===== Before Start ===== ");
+      	System.out.println("FreeMen are: ");
+        for (Person fm : freeMen) {
+        	System.out.print(fm.name + " ");
+        }
+        int i=0;
+
         while (!freeMen.empty()) {
             Person man = freeMen.pop();
             if (man.preferred.peek() != null) {
@@ -75,7 +87,7 @@ public class GS {
                     Person matchedHusband = husbands[futureWife.id];
                     int currentManId = matchedHusband.id;
                     int otherManId = man.id;
-                    if (futureWife.inversePreferred[currentManId] < futureWife.inversePreferred[otherManId]) {
+                    if (futureWife.inversePreferred[currentManId] > futureWife.inversePreferred[otherManId]) {
                         // Reject!
                         freeMen.push(man);
                     } else {
@@ -87,6 +99,24 @@ public class GS {
                     }
                 }
             }
+            i++;
+            System.out.println();
+            System.out.println("===== Iteration " + i + "=====");
+            System.out.println("FreeMen are: ");
+            for (Person fm : freeMen) {
+        		System.out.print(fm.name + " ");
+        	}
+        	System.out.println();
+        	System.out.println("Couples are: ");
+        	System.out.println();
+        	for (Person husband : husbands) {
+            	if (husband == null) {
+                	continue;
+            	}
+            	System.out.print(husband.name + "--");
+            	System.out.println(wives[husband.id].name);
+        	}
+        	
         }
 
         for (Person husband : husbands) {

@@ -1,3 +1,5 @@
+package hacking;
+
 import java.util.Stack;
 
 /**

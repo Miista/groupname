@@ -1,0 +1,75 @@
+\documentclass{tufte-handout}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage{booktabs}
+\usepackage{microtype}
+
+\pagestyle{empty}
+
+\title{Stable Matching Report}
+\author{Martino Secchi, Søren Palmund and Ivan Naumovski}
+
+\begin{document}
+  \maketitle
+
+  \section{Results}
+
+  Our implementation produces the expected results on all small input--
+  output file pairs. On the large input--output file pairs we have tested
+  some samples.
+
+  \noindent
+  On input {\tt sm-bbt-in.txt}, we produce the following matching:
+  \begin{quotation}
+    Sheldon--Amy, Rajesh--Emily, Howard--Bernadette, Leonard--Penny.
+  \end{quotation}
+  
+  \noindent
+  On input {\tt sm-friends-in.txt}, we produce the following matching:
+  \begin{quotation}
+  	Ross--Rachel, Chandler--Monica, Joey--Phoebe
+  \end{quotation}
+
+  \section{Implementation details}
+
+  The input is stored in a raw array where odd numbers are men and even numbers 
+  are women. We have created a {\tt Person} class containing the person's preferences 
+  as a stack and the inverted preferences (in which the key is the id of another person 
+  and the value is the ranked preference).
+
+  We can check to find a free man who has not proposed to every woman in time $O(1)$, 
+  because we store the unmatched men in a stack.
+  
+  \subsection{Run time}
+
+  With these data structures, our implementation runs in time $O(n^2)$ (average) on 
+  inputs with $n$ men and $n$ women.
+
+  The best case is $O(n)$ where every man is matched up with his most preferred woman
+  and there are no unstable matches. Worst case is the situation where one man is consistently
+  matched and later replaced in favor of another man. In this case the run time of our 
+  implementation is $O(n^2)$.
+
+  \subsection{Walkthrough}
+
+  \begin{itemize}
+  \item Pop a free man
+  \item Pop his first preference
+  \item Is she matched?
+    \begin{itemize}
+    \item[] No
+    \begin{itemize}
+    \item Engage the couple
+    \end{itemize}
+    \item[] Yes 
+      \begin{itemize}
+        \item Look up fiancee
+        \item Compare the ranking of him and the free man
+        \item Push the lesser preferred guy onto stack of free men  
+      \end{itemize}
+    \end{itemize}
+    \item Repeat until there are no free men left
+  \end{itemize}
+
+\end{document}

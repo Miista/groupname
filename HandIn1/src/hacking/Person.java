@@ -10,6 +10,10 @@ import java.util.Stack;
 public class Person {
     public String name;
     public Stack<Integer> preferred;
+    /**
+     * The preferences stored according to their ranking.
+     * First place is the most preferred match. The value is the id of the person.
+     */
     public int[] inversePreferred;
 
     public Person(String name) {

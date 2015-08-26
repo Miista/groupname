@@ -11,7 +11,7 @@ public class GS {
 	
 	static class Pair {
 		String husband, wife;
-		
+
 		@Override
 		public String toString() {
 			return husband+" -- "+wife;
@@ -27,36 +27,34 @@ public class GS {
 	}
 	
 	public static Pair[] GaleSharpley(int N, Person[] inp) {
-		Person[] people = inp;
-
 		Integer[] husbands = new Integer[(N+1)];
         Integer[] wives = new Integer[(N+1)];
 
 		Stack<Integer> freeMen = new Stack<>();
 		
 		//every odd number is a man
-		for (int i = 1; i<people.length; i=i+2) {
+		for (int i = 1; i< inp.length; i=i+2) {
 			freeMen.push(i);
 		}
         
         while (!freeMen.empty()) {
             int manId = freeMen.pop();
-            if (people[manId].preferred.peek() != null) {
-                int futureWifeId = people[manId].preferred.pop();
-                Person woman = people[futureWifeId];
+            if (inp[manId].preferred.peek() != null) {
+                int futureWifeId = inp[manId].preferred.pop();
+                Person woman = inp[futureWifeId];
                 // She isn't matched yet!
                 if ( (husbands[ translateId(futureWifeId) ]) == null) {
                     wives[ translateId(manId) ] = futureWifeId;
                     husbands[ translateId(futureWifeId) ] = manId;
                 } else {
-                    int fianceeId = husbands[ translateId(futureWifeId) ];                    
-                    int otherManId = manId;
+                    int fianceeId = husbands[ translateId(futureWifeId) ];
 
-                    if (woman.inversePreferred[fianceeId] > woman.inversePreferred[otherManId]) {
+                    if (woman.inversePreferred[fianceeId] > woman.inversePreferred[manId]) {
                         // Reject!
                         freeMen.push(manId);
                     } else {
-                        wives[ translateId(otherManId) ] = 0;
+                        // Break up the engagement!
+                        wives[ translateId(fianceeId) ] = 0;
                         wives[ translateId(manId) ] = futureWifeId;
                         int otherMan = husbands[ translateId(futureWifeId) ];
                         freeMen.push(otherMan);
@@ -69,10 +67,10 @@ public class GS {
         
         Pair[] pairs = new Pair[N+1];
         Pair p;
-        for (int i = 1; i < people.length; i = i+2) {
+        for (int i = 1; i < inp.length; i = i+2) {
         	p = new Pair();
-        	p.husband = people[i].name;
-        	p.wife = people[ wives[ translateId(i) ] ].name;
+        	p.husband = inp[i].name;
+        	p.wife = inp[ wives[ translateId(i) ] ].name;
 			pairs[ translateId(i) ] = p;
 		}
         
@@ -80,16 +78,20 @@ public class GS {
 	}
 	
     public static void main(String[] args) {
-    	String filepath = args[0];
-    	
-    	Person[] d = InputParser.parseInput(filepath);
-    	
-    	Pair[] result = GS.GaleSharpley(d.length/2, d);
-    	
-    	for (Pair pair : result) {
-    		if(pair == null) continue;
-			System.out.println( pair.toString() );
+		try {
+			String filepath = args[0];
+
+			Person[] d = InputParser.parseInput(filepath);
+
+			Pair[] result = GS.GaleSharpley(d.length/2, d);
+
+			for (Pair pair : result) {
+                if(pair == null) continue;
+                System.out.println( pair.toString() );
+            }
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-    }
+	}
 
 }

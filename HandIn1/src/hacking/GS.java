@@ -4,7 +4,7 @@ import java.util.Stack;
 
 
 /**
- * Created by S�ren Palmund on 24-08-2015.
+ * Created by Soren Palmund on 24-08-2015.
  * Additional work Ivan Naumovski & Martino Secchi
  */
 public class GS {

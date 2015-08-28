@@ -17,7 +17,13 @@ public class GS {
 			return husband+" -- "+wife;
 		}
 	}
-	
+
+    /**
+     * We do this because our arrays start at index 1 and not index 0.
+     *
+     * @param original
+     * @return
+     */
 	private static int translateId(int original) {
 		//if all men are odd, all females are even and we split them in 2 arrays
 		// 1:m 2:w 3:m 4:w 5:m 6:w

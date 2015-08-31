@@ -24,4 +24,9 @@ public class Kernel
     {
         return schedule.empty() ? 0 : schedule.peek().finish;
     }
+
+    public Kernel(Job job)
+    {
+        this.schedule.push( job );
+    }
 }

@@ -8,6 +8,9 @@ import java.util.*;
  */
 public class Main
 {
+
+    private static final TreeMap<Integer, Stack<Kernel>> kernels = new TreeMap<>(  );
+
     public static void main(String[] args)
     {
         ArrayList<Job> input = new ArrayList<>();
@@ -19,33 +22,65 @@ public class Main
 
         input.sort( (o1, o2) -> Integer.compare( o1.start, o2.start ) );
 
-        ArrayList<Kernel> kernels = new ArrayList<>(  );
-        kernels.add( new Kernel() );
-
         for (Job job : input)
         {
-            kernels.sort( (k1, k2) -> Integer.compare( k1.nextAvailableTimes(), k2.nextAvailableTimes() ) );
-            final Kernel kernel = kernels.get( 0 );
-            if (kernel.hasRoomForJob( job ))
+            final Integer kernelKey = kernels.floorKey( job.start );
+
+            if ( kernelKey == null )
             {
-                kernel.add( job );
+                // No entries found in table
+                Kernel newKernel = new Kernel( job );
+
+                addKernel( newKernel, job.finish );
             }
             else
             {
-                Kernel newKernel = new Kernel();
-                newKernel.add( job );
-                kernels.add( newKernel );
+                final Map.Entry<Integer, Stack<Kernel>> entry = kernels.floorEntry( kernelKey );
+
+                // There is a kernel available
+                final Stack<Kernel> stack = entry.getValue();
+                final Kernel kernel = stack.pop(); // Remove kernel as free at the selected time slot
+                kernel.add( job );
+
+                addKernel( kernel, job.finish );
+
+                if (stack.empty())
+                {
+                    kernels.remove( kernelKey );
+                }
             }
         }
 
         int i = 0;
-        for (Kernel kernel : kernels)
+        for (Stack<Kernel> kernelStack : kernels.values())
         {
-            while (!kernel.schedule.empty()) {
-                final Job pop = kernel.schedule.pop();
-                System.out.printf( "%d %d %d\n", pop.start, pop.finish, i );
+            if (kernelStack == null)
+            {
+                continue;
             }
-            i++;
+            while (!kernelStack.empty()) {
+                final Kernel kernel = kernelStack.pop();
+                while (!kernel.schedule.empty()) {
+                    final Job pop = kernel.schedule.pop();
+                    System.out.printf( "%d %d %d\n", pop.start, pop.finish, i );
+                }
+                i++;
+            }
+        }
+    }
+
+    private static void addKernel(Kernel newKernel, int kernelKey)
+    {
+        final Stack<Kernel> possibleNewTimeSlot = kernels.get( kernelKey );
+        if (possibleNewTimeSlot == null)
+        {
+            // No stack available at time slot
+            // So insert a stack
+            final Stack<Kernel> newStack = new Stack<>();
+            newStack.push( newKernel );
+            kernels.put( kernelKey, newStack );
+        } else {
+            possibleNewTimeSlot.push( newKernel );
         }
     }
 }

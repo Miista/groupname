@@ -15,27 +15,22 @@ public class Main
         input.add( new Job( 3, 8 ) );
         input.add( new Job( 2, 4 ) );
         input.add( new Job( 1, 5 ) );
-        input.add( new Job( 5, 8 ) );
+        input.add( new Job( 6, 8 ) );
 
         input.sort( (o1, o2) -> Integer.compare( o1.start, o2.start ) );
 
-        TreeSet<Kernel> kernels = new TreeSet<>( (k1, k2) -> Integer.compare( k1.nextAvailableTimes(), k2.nextAvailableTimes() ) );
+        ArrayList<Kernel> kernels = new ArrayList<>(  );
         kernels.add( new Kernel() );
 
-        Job lastJob = null;
         for (Job job : input)
         {
-            Kernel kernel = kernels.first();
+            kernels.sort( (k1, k2) -> Integer.compare( k1.nextAvailableTimes(), k2.nextAvailableTimes() ) );
+            final Kernel kernel = kernels.get( 0 );
             if (kernel.hasRoomForJob( job ))
             {
-                kernels.remove( kernel );
                 kernel.add( job );
-                if (kernels.add( kernel ))
-                {
-                    System.out.println("lol");
-                }
-                lastJob = job;
-            } else
+            }
+            else
             {
                 Kernel newKernel = new Kernel();
                 newKernel.add( job );
@@ -48,8 +43,7 @@ public class Main
         {
             while (!kernel.schedule.empty()) {
                 final Job pop = kernel.schedule.pop();
-                System.out.printf( "%d %d %d", pop.start, pop.finish, i );
-                System.out.println();
+                System.out.printf( "%d %d %d\n", pop.start, pop.finish, i );
             }
             i++;
         }

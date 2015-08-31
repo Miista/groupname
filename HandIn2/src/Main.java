@@ -35,10 +35,7 @@ public class Main
             }
             else
             {
-                final Map.Entry<Integer, Stack<Kernel>> entry = kernels.floorEntry( kernelKey );
-
-                // There is a kernel available
-                final Stack<Kernel> stack = entry.getValue();
+                final Stack<Kernel> stack = kernels.get( kernelKey );
                 final Kernel kernel = stack.pop(); // Remove kernel as free at the selected time slot
                 kernel.add( job );
 

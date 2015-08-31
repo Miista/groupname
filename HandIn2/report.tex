@@ -1,0 +1,36 @@
+\documentclass{tufte-handout}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage{booktabs}
+\usepackage{microtype}
+
+\pagestyle{empty}
+
+
+\title{Interval Partitioning Report}
+\author{Alice Cooper and Bob Marley}
+
+\begin{document}
+  \maketitle
+
+  \section{Results}
+
+  Our implementation produces the expected results on all
+  input--output file pairs.
+  \sidenote{%
+  Complete the report by filling in your correct names,
+  filling in the parts marked $[\ldots]$,
+  and changing other parts wherever necessary.
+  For instance, if your implementation passes all tests, then write that.
+  Remove the sidenotes in your final hand-in.
+  }
+
+  \section{Implementation details}
+
+  We use the library call \verb+java.util.Collections.shuffle+ on the
+  \verb+java.util.ArrayList+ of FancyObjects to avoid worst case behavior. We
+  then examine all pairs, and in case of a conflict, flip a coin for who gets
+  the room with the smallest index. After that step, our algorithm runs in
+  constant time by guessing the correct output.
+\end{document}

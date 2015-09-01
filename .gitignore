@@ -153,3 +153,11 @@ local.properties
 
 # TeXlipse plugin
 .texlipse
+
+# =======
+# Specific for SAD1 hand-ins
+# =======
+Handin*/*.aux
+Handin*/*.out
+Handin*/*.synctex.gz
+Handin*/*.pdf

@@ -1,9 +1,10 @@
-import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import ip.model.Job;
 import ip.model.Kernel;
 
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Stack;
+import java.util.TreeMap;
 
 /**
  * Created by Soren Palmund on 31-08-2015.
@@ -56,23 +57,23 @@ public class IP
         {
             // Attempt to find the id of the kernel that is available
             // at the specified time or earlier
-            final Integer kernelKey = kernels.floorKey( job.start );
+            final Integer timeslot = kernels.floorKey( job.start );
 
-            if ( kernelKey == null ) // No available kernel
+            if ( timeslot == null ) // No available kernel
             {
                 Kernel newKernel = Kernel.createWithJob( job );
                 addKernel( newKernel, job.finish, kernels );
             }
             else
             {
-                final Stack<Kernel> stack = kernels.get( kernelKey );
-                final Kernel kernel = stack.pop(); // Remove kernel as free at the selected time slot
+                final Stack<Kernel> availableKernels = kernels.get( timeslot );
+                final Kernel kernel = availableKernels.pop(); // Remove kernel as free at the selected time slot
                 kernel.add( job );
                 addKernel( kernel, job.finish, kernels );
 
-                if (stack.empty())
+                if (availableKernels.empty())
                 {
-                    kernels.remove( kernelKey );
+                    kernels.remove( timeslot );
                 }
             }
         }
@@ -80,22 +81,22 @@ public class IP
         return kernels;
     }
 
-    private static void addKernel(Kernel newKernel, int kernelKey, TreeMap<Integer, Stack<Kernel>> kernels)
+    private static void addKernel(Kernel kernel, int timeslot, TreeMap<Integer, Stack<Kernel>> kernels)
     {
         /*
         If there are no stack of kernels available at the time, that means
         that no kernels were available at the time.
          */
-        final Stack<Kernel> possibleNewTimeSlot = kernels.get( kernelKey );
-        if (possibleNewTimeSlot == null)
+        final Stack<Kernel> availableKernels = kernels.get( timeslot );
+        if (availableKernels == null)
         {
             // No kernels available at time slot
             // So insert a stack
-            final Stack<Kernel> newStack = new Stack<>();
-            newStack.push( newKernel );
-            kernels.put( kernelKey, newStack );
+            final Stack<Kernel> stack = new Stack<>();
+            stack.push( kernel );
+            kernels.put( timeslot, stack );
         } else {
-            possibleNewTimeSlot.push( newKernel );
+            availableKernels.push( kernel );
         }
     }
 }

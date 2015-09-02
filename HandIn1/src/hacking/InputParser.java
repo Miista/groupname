@@ -34,15 +34,15 @@ public class InputParser {
 	 * @param peopleSize the total number of people
 	 * @return an array of persons with names
 	 */
-	private static Person[] initPeople(int peopleSize) {
+	private static GS.Person[] initPeople(int peopleSize) {
 		//id's start at 1 and not 0 - alternative could be to subtract 1 from every id 
-		Person[] people = new Person[peopleSize + 1];
+		GS.Person[] people = new GS.Person[peopleSize + 1];
 
 		String[] personData;
 		for (int i = 0; i < peopleSize; i++) {
 			personData = s.nextLine().split(" "); //Format: ID Name ie. 1 Al
 			// 							vv ID							vv Name
-			people[ Integer.parseInt( personData[0] ) ] = new Person( personData[1] );
+			people[ Integer.parseInt( personData[0] ) ] = new GS.Person( personData[1] );
 		}
 		return people;
 	}
@@ -52,7 +52,7 @@ public class InputParser {
 	 * @param people an array of people
 	 * @return an array of Persons
 	 */
-	private static Person[] readPreferences(Person[] people) {
+	private static GS.Person[] readPreferences(GS.Person[] people) {
 		//preference parse
 		String pref;
 		int id;
@@ -78,10 +78,10 @@ public class InputParser {
 		return people;
 	}
 	
-	public static Person[] parseInput(String filename) {
+	public static GS.Person[] parseInput(String filename) {
 		try {
 			s = new Scanner( new File(filename), "UTF-8" );
-			Person[] tmp, result;
+			GS.Person[] tmp, result;
 			
 			int size = readHeaders();
 			System.out.println("n = "+size);

@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Created by Soren Palmund on 31-08-2015.
  */
-public class Main
+public class IP
 {
     public static void main(String[] args)
     {
@@ -49,17 +49,16 @@ public class Main
         Arrays.sort( input, (o1, o2) -> Integer.compare( o1.start, o2.start ) );
 
         /**
-         * This tree structure is indexed by what time the kernel is available.
+         * This tree structure is indexed by when the kernel is available.
          */
         final TreeMap<Integer, Stack<Kernel>> kernels = new TreeMap<>(  );
         for (Job job : input)
         {
-            // Attempt to find an available kernel at time: job.start
-            // Finds the kernel key of the kernel that is available
-            // at the time or earlier
+            // Attempt to find the id of the kernel that is available
+            // at the specified time or earlier
             final Integer kernelKey = kernels.floorKey( job.start );
 
-            if ( kernelKey == null ) // No entries found in table
+            if ( kernelKey == null ) // No available kernel
             {
                 Kernel newKernel = Kernel.createWithJob( job );
                 addKernel( newKernel, job.finish, kernels );
@@ -83,10 +82,14 @@ public class Main
 
     private static void addKernel(Kernel newKernel, int kernelKey, TreeMap<Integer, Stack<Kernel>> kernels)
     {
+        /*
+        If there are no stack of kernels available at the time, that means
+        that no kernels were available at the time.
+         */
         final Stack<Kernel> possibleNewTimeSlot = kernels.get( kernelKey );
         if (possibleNewTimeSlot == null)
         {
-            // No stack available at time slot
+            // No kernels available at time slot
             // So insert a stack
             final Stack<Kernel> newStack = new Stack<>();
             newStack.push( newKernel );

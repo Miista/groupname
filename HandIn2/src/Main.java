@@ -45,11 +45,18 @@ public class Main
 
     private static TreeMap<Integer, Stack<Kernel>> schedulePartitioning(Job[] input)
     {
+        // Sort the input according to start time -> earliest start time
         Arrays.sort( input, (o1, o2) -> Integer.compare( o1.start, o2.start ) );
 
+        /**
+         * This tree structure is indexed by what time the kernel is available.
+         */
         final TreeMap<Integer, Stack<Kernel>> kernels = new TreeMap<>(  );
         for (Job job : input)
         {
+            // Attempt to find an available kernel at time: job.start
+            // Finds the kernel key of the kernel that is available
+            // at the time or earlier
             final Integer kernelKey = kernels.floorKey( job.start );
 
             if ( kernelKey == null ) // No entries found in table

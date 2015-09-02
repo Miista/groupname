@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 /**
- * Created by S�ren Palmund on 31-08-2015.
+ * Created by Soren Palmund on 31-08-2015.
  */
 public class Main
 {

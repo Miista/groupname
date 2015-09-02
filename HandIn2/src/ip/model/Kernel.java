@@ -1,6 +1,5 @@
 package ip.model;
 
-import java.util.ArrayList;
 import java.util.Stack;
 
 /**
@@ -8,6 +7,10 @@ import java.util.Stack;
  */
 public class Kernel
 {
+    private static int counter = 0;
+
+    public int id;
+
     public Stack<Job> schedule = new Stack<>();
 
     public void add(Job job)
@@ -25,8 +28,13 @@ public class Kernel
         return schedule.empty() ? 0 : schedule.peek().finish;
     }
 
-    public Kernel(Job job)
+    public static Kernel createWithJob(Job job) {
+        return new Kernel( counter++, job );
+    }
+
+    private Kernel(int id, Job job)
     {
+        this.id = id;
         this.schedule.push( job );
     }
 }

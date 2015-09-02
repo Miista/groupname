@@ -1,45 +1,68 @@
+import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import ip.model.Job;
 import ip.model.Kernel;
 
+import java.io.FileNotFoundException;
 import java.util.*;
 
 /**
- * Created by Søren Palmund on 31-08-2015.
+ * Created by Sï¿½ren Palmund on 31-08-2015.
  */
 public class Main
 {
-
-    private static final TreeMap<Integer, Stack<Kernel>> kernels = new TreeMap<>(  );
-
     public static void main(String[] args)
     {
-        ArrayList<Job> input = new ArrayList<>();
-        input.add( new Job( 5, 7 ) );
-        input.add( new Job( 3, 8 ) );
-        input.add( new Job( 2, 4 ) );
-        input.add( new Job( 1, 5 ) );
-        input.add( new Job( 6, 8 ) );
+        try
+        {
+            Job[] input = InputParser.readFromFile( args[ 0 ] );
 
-        input.sort( (o1, o2) -> Integer.compare( o1.start, o2.start ) );
+            final TreeMap<Integer, Stack<Kernel>> kernels = schedulePartitioning( input );
 
+            Job[] list = new Job[ input.length ];
+            for (Stack<Kernel> kernelStack : kernels.values())
+            {
+                while (!kernelStack.empty()) {
+                    final Kernel kernel = kernelStack.pop();
+                    for (Job job : kernel.schedule)
+                    {
+                        job.kernelId = kernel.id;
+                        list[ job.id ] = job;
+                    }
+                }
+            }
+
+            System.out.println( kernels.values().size() );
+            for (Job job : list)
+            {
+                System.out.printf( "%d %d %d\n", job.start, job.finish, job.kernelId );
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private static TreeMap<Integer, Stack<Kernel>> schedulePartitioning(Job[] input)
+    {
+        Arrays.sort( input, (o1, o2) -> Integer.compare( o1.start, o2.start ) );
+
+        final TreeMap<Integer, Stack<Kernel>> kernels = new TreeMap<>(  );
         for (Job job : input)
         {
             final Integer kernelKey = kernels.floorKey( job.start );
 
-            if ( kernelKey == null )
+            if ( kernelKey == null ) // No entries found in table
             {
-                // No entries found in table
-                Kernel newKernel = new Kernel( job );
-
-                addKernel( newKernel, job.finish );
+                Kernel newKernel = Kernel.createWithJob( job );
+                addKernel( newKernel, job.finish, kernels );
             }
             else
             {
                 final Stack<Kernel> stack = kernels.get( kernelKey );
                 final Kernel kernel = stack.pop(); // Remove kernel as free at the selected time slot
                 kernel.add( job );
-
-                addKernel( kernel, job.finish );
+                addKernel( kernel, job.finish, kernels );
 
                 if (stack.empty())
                 {
@@ -48,25 +71,10 @@ public class Main
             }
         }
 
-        int i = 0;
-        for (Stack<Kernel> kernelStack : kernels.values())
-        {
-            if (kernelStack == null)
-            {
-                continue;
-            }
-            while (!kernelStack.empty()) {
-                final Kernel kernel = kernelStack.pop();
-                while (!kernel.schedule.empty()) {
-                    final Job pop = kernel.schedule.pop();
-                    System.out.printf( "%d %d %d\n", pop.start, pop.finish, i );
-                }
-                i++;
-            }
-        }
+        return kernels;
     }
 
-    private static void addKernel(Kernel newKernel, int kernelKey)
+    private static void addKernel(Kernel newKernel, int kernelKey, TreeMap<Integer, Stack<Kernel>> kernels)
     {
         final Stack<Kernel> possibleNewTimeSlot = kernels.get( kernelKey );
         if (possibleNewTimeSlot == null)

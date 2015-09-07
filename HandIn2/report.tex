@@ -5,11 +5,12 @@
 \usepackage{booktabs}
 \usepackage{microtype}
 
+\newcommand{\tabitem}{~~\llap{\textbullet}~~}
+
 \pagestyle{empty}
 
-
 \title{Interval IP Report}
-\author{Alice Cooper and Bob Marley}
+\author{Martino Secchi, Ivan Naumovski \& Søren Palmund}
 
 \begin{document}
   \maketitle
@@ -17,20 +18,43 @@
   \section{Results}
 
   Our implementation produces the expected results on all
-  input--output file pairs.
-  \sidenote{%
-  Complete the report by filling in your correct names,
-  filling in the parts marked $[\ldots]$,
-  and changing other parts wherever necessary.
-  For instance, if your implementation passes all tests, then write that.
-  Remove the sidenotes in your final hand-in.
-  }
+  input--output file pairs. Our algorithm uses the same number of kernels but some jobs are scheduled differently than what is in the output files. 
 
   \section{Implementation details}
 
-  We use the library call \verb+java.util.Collections.shuffle+ on the
-  \verb+java.util.ArrayList+ of FancyObjects to avoid worst case behavior. We
-  then examine all pairs, and in case of a conflict, flip a coin for who gets
-  the room with the smallest index. After that step, our algorithm runs in
-  constant time by guessing the correct output.
+  We have two classes that we use in the algorithm:
+  \begin{itemize}
+	\item \verb+Job+ which contains start time, end time, job id and kernel id. The latter two mainly for ordering and printing the output.
+	\item \verb+Kernel+ is basically a wrapper around a \verb+Stack+ of \verb+Job+s. Each kernel has a unique id.
+  \end{itemize}
+
+  \noindent
+  We store the kernels in a binary search tree indexed by what time they are available. This allows us to find an available kernel in $O(log n)$.\newline \noindent
+  Each kernel is represented as a stack of jobs. This allows us to add a job to the kernel in $O(1)$.\linebreak
+  
+  \noindent
+  For our stacks we use \verb+java.util.Stack+ and for our binary search tree we use \verb+java.util.TreeMap+.
+
+\subsection{Run time}
+
+  With these data structures, our implementation runs in time $O(n\ log\ n)$ on 
+  inputs with $n$ jobs.
+
+\subsection{Walkthrough}
+
+  In the following we'll use $j$ to mean the current job, $j_s$ refers to the start time of $j$, and $j_f$ to mean the finish time of $j$.\linebreak
+
+  We sort the input by increasing start time in time $O(n\ log\ n)$. Then for each job $j$ we...
+  
+  \begin{tabular}{| l | l |} \hline
+    \textbf{Step} & \textbf{Run time} \\ \hline
+    Attempt to find a kernel $k$ that is available at time $j_s$ or earlier & $O(log\ n)$ \\
+    \tabitem If no kernel is available we'll create one and add $j$ to it &  \\
+    \tabitem If one is available we'll simply add $j$ to $k$'s schedule &  \\
+    We remove $k$ from the tree at $j_s$ and re-insert it at $j_f$ & $O(log\ n)$ \\
+    \hline
+  \end{tabular}
+  
+  Removing $k$ from the tree makes it unavailable at time $j_s$. Adding it again at time $j_f$ makes it available at that time. Doing this ensures that our tree is always sorted and up to date with available kernels.
+  
 \end{document}

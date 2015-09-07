@@ -19,10 +19,12 @@ public class IP
 
             final TreeMap<Integer, Stack<Kernel>> kernels = schedulePartitioning( input );
 
+            int kernelCount = 0;
             Job[] list = new Job[ input.length ];
             for (Stack<Kernel> kernelStack : kernels.values())
             {
                 while (!kernelStack.empty()) {
+                    kernelCount++;
                     final Kernel kernel = kernelStack.pop();
                     for (Job job : kernel.schedule)
                     {
@@ -32,7 +34,7 @@ public class IP
                 }
             }
 
-            System.out.println( kernels.values().size() );
+            System.out.println( kernelCount );
             for (Job job : list)
             {
                 System.out.printf( "%d %d %d\n", job.start, job.finish, job.kernelId );
@@ -68,7 +70,7 @@ public class IP
             {
                 final Stack<Kernel> availableKernels = kernels.get( timeslot );
                 final Kernel kernel = availableKernels.pop(); // Remove kernel as free at the selected time slot
-                kernel.add( job );
+                kernel.schedule.push( job );
                 addKernel( kernel, job.finish, kernels );
 
                 if (availableKernels.empty())

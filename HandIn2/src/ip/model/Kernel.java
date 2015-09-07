@@ -9,24 +9,9 @@ public class Kernel
 {
     private static int counter = 0;
 
-    public int id;
+    public final int id;
 
-    public Stack<Job> schedule = new Stack<>();
-
-    public void add(Job job)
-    {
-        schedule.add( job );
-    }
-
-    public boolean hasRoomForJob(Job job)
-    {
-        return schedule.empty() || schedule.peek().finish <= job.start;
-    }
-
-    public int nextAvailableTimes()
-    {
-        return schedule.empty() ? 0 : schedule.peek().finish;
-    }
+    public final Stack<Job> schedule = new Stack<>();
 
     public static Kernel createWithJob(Job job) {
         return new Kernel( counter++, job );
@@ -37,4 +22,5 @@ public class Kernel
         this.id = id;
         this.schedule.push( job );
     }
+
 }

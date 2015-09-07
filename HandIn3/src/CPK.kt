@@ -12,7 +12,7 @@ public fun main(args: Array<String>) {
     //        points.add( new Point( 3, -10 ) );
     ////        points.add( new Point( 4, 90 ) );
     //        points.add( new Point( 5, 100 ) );
-    val pointPointPair = ClosestPair( points.sortBy { it.x } )
+    val pointPointPair = ClosestPair( points.subList(0, 5000).sortBy { it.x } )
     System.out.printf("Pair 1: (%d, %d)\n", pointPointPair.left?.x, pointPointPair.left?.y)
     System.out.printf("Pair 2: (%d, %d)\n", pointPointPair.right?.x, pointPointPair.right?.y)
 }
@@ -22,11 +22,18 @@ public tailRecursive fun ClosestPair(points: List<Point>): CP.EuclideanPair {
         3  -> getClosestPairOf3(points)
         2 -> CP.EuclideanPair(points.get(0), points.get(1))
         else -> {
+            println(points.size())
             val median = points.size() / 2
+            println(median)
             val left = points.subList(0, median)
             val right = points.subList(median, points.size())
             val closestLeftPair = ClosestPair(left)
             val closestRightPair = ClosestPair(right)
+
+            if (closestLeftPair.distance == closestRightPair.distance)
+            {
+                return closestLeftPair;
+            }
 
             val delta = Math.min(closestLeftPair.distance, closestRightPair.distance)
 

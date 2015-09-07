@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -10,15 +11,22 @@ import java.util.Scanner;
  */
 public class CPParser
 {
-    public static List<Point> readPoints(String filename) throws FileNotFoundException
+    public static ArrayList<CP.EPoint> readPoints(String filename) throws FileNotFoundException
     {
         int i = 0;
         Scanner s = new Scanner( new File( filename ) );
-        List<Point> points = new ArrayList<>();
+        ArrayList<CP.EPoint> points = new ArrayList<>();
         String[] job;
         while( s.hasNextLine() ) {
-            job = s.nextLine().split(" ");
-            points.add( new Point( Integer.parseInt( job[ 1 ] ), Integer.parseInt( job[ 2 ] ) ) );
+            final String line = s.nextLine();
+            if ("".equals( line ) || line.contains( ":" ) || line.contains( "_" ) || line.contains( "EOF" ))
+            {
+                continue;
+            }
+            job = line
+                   .split( " +" );
+//            System.out.println(line);
+            points.add( new CP.EPoint( Double.parseDouble( job[ 1 ] ), Double.parseDouble( job[ 2 ] ) ) );
             i++;
         }
         return points;

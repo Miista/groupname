@@ -1,6 +1,7 @@
 import javafx.util.Pair;
 
 import java.awt.Point;
+import java.io.FileNotFoundException;
 import java.nio.channels.Pipe;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,15 +13,16 @@ import java.util.List;
  */
 public class CP
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws FileNotFoundException
     {
-        List<Point> points = new ArrayList<>(  );
-        points.add( new Point( 0, 0 ) );
-//        points.add( new Point( 1, 2 ) );
-        points.add( new Point( 2, -11 ) );
-        points.add( new Point( 3, -10 ) );
-//        points.add( new Point( 4, 90 ) );
-        points.add( new Point( 5, 100 ) );
+        List<Point> points = CPParser.readPoints( args[0] );
+//        new ArrayList<>(  );
+//        points.add( new Point( 0, 0 ) );
+////        points.add( new Point( 1, 2 ) );
+//        points.add( new Point( 2, -11 ) );
+//        points.add( new Point( 3, -10 ) );
+////        points.add( new Point( 4, 90 ) );
+//        points.add( new Point( 5, 100 ) );
         Collections.sort( points, (o1, o2) -> Integer.compare( o1.x, o2.x ) );
         final EuclideanPair pointPointPair = ClosestPair( points );
         System.out.printf( "Pair 1: (%d, %d)\n", pointPointPair.left.x, pointPointPair.left.y );

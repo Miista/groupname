@@ -15,98 +15,90 @@ public class CP
     public static void main(String[] args) throws FileNotFoundException
     {
         ArrayList<EPoint> EPoints = CPParser.readPoints( args[ 0 ] );
-//        new ArrayList<>(  );
-//        EPoints.add( new EPoint( 0, 0 ) );
-////        EPoints.add( new EPoint( 1, 2 ) );
-//        EPoints.add( new EPoint( 2, -11 ) );
-//        EPoints.add( new EPoint( 3, -10 ) );
-////        EPoints.add( new EPoint( 4, 90 ) );
-//        EPoints.add( new EPoint( 5, 100 ) );
-        Collections.shuffle( EPoints );
         Collections.sort( EPoints, (o1, o2) -> Double.compare( o1.x, o2.x ) );
-        final ArrayList<EPoint> sortedByY = EPoints;
-        Collections.sort( sortedByY, (o1, o2) -> Double.compare( o1.y, o2.y ) );
-        final long before = System.currentTimeMillis();
-        final EuclideanPair EPointEPointPair = closestPairDAQ( EPoints, sortedByY );
-        final long after = System.currentTimeMillis();
-        System.out.println( (after - before) );
-        System.out.printf( "Pair 1: (%f, %f)\n", EPointEPointPair.left.x, EPointEPointPair.left.y );
-        System.out.printf( "Pair 2: (%f, %f)\n", EPointEPointPair.right.x, EPointEPointPair.right.y );
         final long ourBefore = System.currentTimeMillis();
-        final EuclideanPair pair = ClosestPair( EPoints );
+        points = EPoints;
+        final EuclideanPair pair = ClosestPairRico( 0, points.size()-1 );
         final long ourAfter = System.currentTimeMillis();
         System.out.println( ourAfter - ourBefore );
+        System.out.println(pair.distance());
         System.out.printf( "Pair 1: (%f, %f)\n", pair.left.x, pair.left.y );
         System.out.printf( "Pair 2: (%f, %f)\n", pair.right.x, pair.right.y );
     }
 
-    public static EuclideanPair closestPairDAQ(List<EPoint> xs, List<EPoint> ys)
+    private static ArrayList<EPoint> points;
+
+    public static EuclideanPair ClosestPairRico(int start, int end)
     {
-        if (xs.size() == 2)
+        switch (end - start + 1)
         {
-            return new EuclideanPair( xs.get( 0 ), xs.get( 1 ) );
-        }
-        if (xs.size() <= 3)
-        {
-            return getClosestPairOf3( xs );
-        }
+            case 3: // Only 3 EPoints - Base Case
+                return getClosestPairOf3Rico(start, end);
+            case 2:
+                return new EuclideanPair( points.get( start ), points.get( end ) );
+            case 1: // We can't handle this shit!
+                System.exit( -2 );
+                break;
+            default:
+                final int medianIndex = start + ((end - start) / 2);
+                final EuclideanPair closestLeftPair = ClosestPairRico( start, medianIndex );
+                final EuclideanPair closestRightPair = ClosestPairRico( medianIndex, end );
 
-        final int median = xs.size() / 2;
-        final List<EPoint> leftOfCenter = xs.subList( 0, median );
-        final List<EPoint> rightOfCenter = xs.subList( median, xs.size() );
+                double delta = Math.min( closestLeftPair.distance(), closestRightPair.distance() );
 
-        final ArrayList<EPoint> tempList = new ArrayList<>( leftOfCenter );
-        Collections.sort( tempList, (o1, o2) -> Double.compare( o1.y, o2.y ) );
 
-        final EuclideanPair leftPair = closestPairDAQ( leftOfCenter, tempList );
 
-        tempList.clear();
-        tempList.addAll( rightOfCenter );
-        Collections.sort( tempList, (o1, o2) -> Double.compare( o1.y, o2.y ) );
-        final EuclideanPair rightPair = closestPairDAQ( rightOfCenter, tempList );
-
-        EuclideanPair closestPair;
-        if (leftPair.distance < rightPair.distance)
-        {
-            closestPair = leftPair;
-        }
-        else {
-            closestPair = rightPair;
-        }
-
-        double delta = Math.min( leftPair.distance, rightPair.distance );
-
-        final int lowerBound = (int) (median - delta);
-        final int upperBound = (int) (median + delta);
-
-        tempList.clear();
-        for (EPoint py : ys)
-        {
-            if (py.x < upperBound && lowerBound < py.x )
-            {
-                tempList.add( py );
-            }
-        }
-
-        Collections.sort( tempList, (o1, o2) -> Double.compare( o1.y, o2.y ) );
-
-        for (int i = 0; i < tempList.size(); i++)
-        {
-            final EPoint p = tempList.get( i );
-            for (int j = i+1; j < delta; j++)
-            {
-                if (j >= tempList.size()) {
-                    break;
-                }
-                if (tempList.get( j ).distance( p ) < delta)
+                EuclideanPair pair;
+                if (closestLeftPair.distance() < closestRightPair.distance())
                 {
-                    closestPair = new EuclideanPair( p, tempList.get( j ) );
-                    delta = tempList.get( j ).distance( p );
+                    pair = closestLeftPair;
                 }
-            }
-        }
+                else {
+                    pair = closestRightPair;
+                }
 
-        return closestPair;
+//                final ArrayList<EPoint> pointsBeingStitched = new ArrayList<>();
+//                for (int i = start; i < end; i++)
+//                {
+//                    final EPoint next = points.get( i );
+//                    if (lowerBound < next.x && next.x < upperBound)
+//                    {
+//                        pointsBeingStitched.add( next );
+//                    }
+//                }
+
+                final double medianX = points.get( medianIndex ).x;
+                final int lowerBound = (int) (medianX - delta);
+                final int upperBound = (int) (medianX + delta);
+
+                int p1 = -1, p2 = -1;
+                for (int i = start; i < end; i++)
+                {
+                    final EPoint p = points.get( i );
+                    if (p.x <= lowerBound || p.x >= upperBound)
+                    {
+                        continue;
+                    }
+                    for (int j = i+1; j <= i+16; j++)
+                    {
+                        if (j >= end) {
+                            break;
+                        }
+                        final double distance = points.get( j ).distance( p );
+                        if (distance < delta)
+                        {
+                            p1 = i;
+                            p2 = j;
+                            delta = distance;
+                        }
+                    }
+                }
+
+                return p1 == -1
+                        ? pair
+                        : new EuclideanPair( points.get( p1 ), points.get( p2 ) );
+        }
+        return null;
     }
 
     public static EuclideanPair ClosestPair(ArrayList<EPoint> points)
@@ -135,7 +127,7 @@ public class CP
                 final EuclideanPair closestLeftPair = ClosestPair( left );
                 final EuclideanPair closestRightPair = ClosestPair( right );
 
-                double delta = Math.min( closestLeftPair.distance, closestRightPair.distance );
+                double delta = Math.min( closestLeftPair.distance(), closestRightPair.distance() );
 
                 final int lowerBound = (int) (median - delta);
                 final int upperBound = (int) (median + delta);
@@ -151,32 +143,65 @@ public class CP
                 }
 
                 EuclideanPair pair;
-                if (closestLeftPair.distance < closestRightPair.distance)
+                if (closestLeftPair.distance() < closestRightPair.distance())
                 {
                     pair = closestLeftPair;
                 }
                 else {
                     pair = closestRightPair;
                 }
+
+                int p1 = -1, p2 = -1;
                 for (int i = 0; i < points.size(); i++)
                 {
                     final EPoint p = points.get( i );
-                    for (int j = i+1; j < delta; j++)
+                    for (int j = i+1; j <= delta; j++)
                     {
                         if (j >= points.size()) {
                             break;
                         }
-                        if (points.get( j ).distance( p ) < delta)
+                        final double distance = points.get( j ).distance( p );
+                        if (distance < delta)
                         {
-                            pair = new EuclideanPair( p, points.get( j ) );
-                            delta = points.get( j ).distance( p );
+                            p1 = i;
+                            p2 = j;
+                            delta = distance;
                         }
                     }
                 }
 
-                return pair;
+                return p1 == -1
+                        ? pair
+                        : new EuclideanPair( points.get( p1 ), points.get( p2 ) );
         }
         return null;
+    }
+
+    private static EuclideanPair getClosestPairOf3Rico(int start, int end)
+    {
+        final EPoint A = points.get( start );
+        final EPoint B = points.get( start+1 );
+        final EPoint C = points.get( end );
+        final double ab = A.distance( B );
+        final double bc = B.distance( C );
+        final double ca = C.distance( A );
+        EPoint left, right;
+        if (ab < bc)
+        {
+            left = A;
+            right = B;
+        } else
+        {
+            left = B;
+            right = C;
+        }
+        if (ca < ab)
+        {
+            left = A;
+            right = C;
+        }
+
+        return new EuclideanPair( left, right );
     }
 
     private static EuclideanPair getClosestPairOf3(List<EPoint> EPoints)
@@ -224,27 +249,22 @@ public class CP
         }
     }
 
-    static class EuclideanPair
+    public static class EuclideanPair
     {
-        public final EPoint left;
-        public final EPoint right;
-
-        public final double distance;
+        public EPoint left;
+        public EPoint right;
 
         public EuclideanPair(EPoint left, EPoint right)
         {
             this.left = left;
             this.right = right;
-            distance = distance();
         }
 
-        private double distance()
+        public double distance()
         {
             final double y = Math.abs( left.y - right.y );
             final double x = Math.abs( left.x - right.x );
             return Math.sqrt( y * y + x * x );
         }
-
-
     }
 }

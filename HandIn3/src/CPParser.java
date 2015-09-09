@@ -1,13 +1,10 @@
-import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
 /**
- * Created by Søren Palmund on 07-09-2015.
+ * Created by Sï¿½ren Palmund on 07-09-2015.
  */
 public class CPParser
 {

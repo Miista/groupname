@@ -11,12 +11,12 @@ public class CP
         ArrayList<EPoint> EPoints = CPParser.readPoints( args[ 0 ] );
         Collections.sort( EPoints, (o1, o2) -> Double.compare( o1.x, o2.x ) );
         points = EPoints;
-        System.out.println( points.size() );
+        System.out.println( "Number of points: "+points.size() );
         final long ourBefore = System.currentTimeMillis();
         final int[] cp = ClosestPair( 0, points.size() - 1 );
         final long ourAfter = System.currentTimeMillis();
         final EuclideanPair pair = new EuclideanPair( points.get( cp[0]), points.get( cp[1] ) );
-        System.out.println( ourAfter - ourBefore );
+        System.out.println( "O: " + (ourAfter - ourBefore) );
         System.out.println( pair.distance() );
     }
 

@@ -1,0 +1,63 @@
+\documentclass{tufte-handout}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage{booktabs}
+\usepackage{microtype}
+
+\pagestyle{empty}
+
+
+\title{Closest Pair Report}
+\author{Martino Secchi, Ivan Naumovski, and Søren Palmund}
+
+\begin{document}
+  \maketitle
+
+  \section{Results}
+
+  Our implementation produces the expected results on all input--output file pairs.
+
+  The following table shows the closest pairs in some of the input files {\tt wc-instance-*.txt}.
+  Here $n$ denotes the number of points in the input,
+  and distance $\delta$.
+
+  \bigskip\noindent
+  \begin{tabular}{rr}\toprule
+    $n$ & $\delta$ \\\midrule
+    2 & 1.0 \\
+    254 & 1.0 \\
+    16382 & 1.0 \\
+    65534 & 1.0 \\\bottomrule
+  \end{tabular}
+
+
+  \section{Implementation details}
+  We have a global array of points called $points$ which contains all the points sorted by increasing $x$-value.
+
+    Our running time is $O(n\log n)$ for $n$ points.
+  \sidenote{Change or delete as necessary, add anything else you find interesting about your implemenation.}
+    
+  \subsection{Walkthrough}
+  
+  We call the method \verb+ClosestPair+ which takes a $start$ and $end$ which are indexes into the $points$ array.
+  
+  The method examines the number of points that are in between $start$ and $end$.\newline
+
+  If there are only 3 points then we compute the closest pair.\newline
+  
+  If there are 2 points then we simply say that the two points are the closest pair.\newline
+  
+  In any other case we compute the median $m$ and split $points$ into two smaller subsets:\newline
+
+  $S_1 = [start..m]$\newline
+  $S_2 = ]m..end]$\newline
+
+  We then call \verb+ClosestPair+ recursively to get the smallest distance on the left side $d_{left}$ and on the right side $d_{right}$.
+
+We then set the delta $\delta = min(d_{left}, d_{right})$.\newline
+
+Using $\delta$ we compute the range around $m$ (in the range $m \pm \delta$) which might hold pairs that are closer than what we've found so far.
+To help with this we compute upper bound and lower bounds between which we'll consider every pair.
+
+\end{document}

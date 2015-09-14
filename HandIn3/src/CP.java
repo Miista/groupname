@@ -1,5 +1,3 @@
-import javafx.util.Pair;
-
 import java.io.FileNotFoundException;
 import java.util.*;
 
@@ -14,7 +12,7 @@ public class CP
         Collections.sort( EPoints, (o1, o2) -> Double.compare( o1.x, o2.x ) );
         final long ourBefore = System.currentTimeMillis();
         points = EPoints;
-        final int[] cp = ClosestPairRico( 0, points.size() - 1 );
+        final int[] cp = ClosestPair( 0, points.size() - 1 );
         final EuclideanPair pair = new EuclideanPair( points.get( cp[0]), points.get( cp[1] ) );
         final long ourAfter = System.currentTimeMillis();
         System.out.println( ourAfter - ourBefore );
@@ -32,12 +30,12 @@ public class CP
         return Math.sqrt( y * y + x * x );
     }
 
-    public static int[] ClosestPairRico(int start, int end)
+    public static int[] ClosestPair(int start, int end)
     {
         switch (end - start + 1)
         {
             case 3: // Only 3 EPoints - Base Case
-                return getClosestPairOf3Rico(start, end);
+                return getClosestPairOf3( start, end );
             case 2:
                 return new int[] { start, end };
             case 1: // We can't handle this shit!
@@ -45,8 +43,8 @@ public class CP
                 break;
             default:
                 final int medianIndex = start + ((end - start) / 2);
-                final int[] closestLeftPair = ClosestPairRico( start, medianIndex );
-                final int[] closestRightPair = ClosestPairRico( medianIndex, end );
+                final int[] closestLeftPair = ClosestPair( start, medianIndex );
+                final int[] closestRightPair = ClosestPair( medianIndex, end );
 
                 EPoint leftPoint = points.get( closestLeftPair[ 0 ] );
                 EPoint rightPoint = points.get( closestLeftPair[1] );
@@ -98,7 +96,7 @@ public class CP
         return null;
     }
 
-    private static int[] getClosestPairOf3Rico(int start, int end)
+    private static int[] getClosestPairOf3(int start, int end)
     {
         final EPoint A = points.get( start );
         final EPoint B = points.get( start+1 );

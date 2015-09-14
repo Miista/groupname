@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.FileNotFoundException;
@@ -5,7 +6,7 @@ import java.io.FileNotFoundException;
 
 public class Matcher {
 
-	final static int delta = -4;
+	final static int delta = 2;
 	static Map<String, Integer> costs = InputParser.readCosts("gorilla_data/BLOSUM62.txt");
 	static String a, b;
 	static int[][] vals;
@@ -23,7 +24,7 @@ public class Matcher {
 		}
 		
 		for (int i = 1; i < a.length(); i++) {
-			for (int j = 1; j < b.length(); j++) {				
+			for (int j = 1; j < b.length(); j++) {
 				vals[i][j] = optimal(i,j);
 			}
 		}
@@ -38,14 +39,29 @@ public class Matcher {
 		if (j==0) {
 			return i*delta;
 		}
-		
-		return Math.max( Math.max( alfa(i,j) + optimal(i-1, j-1), delta +  optimal(i-1,j ) ), delta + optimal(i, j-1) );
+
+		final int C = delta + optimal( i, j - 1 );
+		final int B = delta + optimal( i - 1, j );
+		final int A = alfa( i, j ) + optimal( i - 1, j - 1 );
+		return Math.min( Math.min( A, B ), C );
 	}
 
 	private static int alfa(int i, int j) {
 		System.out.println(" alpha : "+ i +" "+ j );
-		System.out.println(costs.get("" + a.charAt(i) + b.charAt(j)));
-		return costs.get("" + a.charAt(i) + b.charAt(j));
+		System.out.println( costs.get( "" + a.charAt( i ) + b.charAt( j ) ) );
+		final ArrayList<Character> vowels = new ArrayList<Character>()
+		{{
+				add( 'a' );
+				add( 'e' );
+				add( 'i' );
+				add( 'o' );
+				add( 'u' );
+			}};
+		return ((vowels.contains( a.charAt( i ) ) && vowels.contains( b.charAt( j )))
+				|| (!vowels.contains( a.charAt( i ) ) && !vowels.contains( b.charAt( j ))))
+				? 1
+				: 3;
+//		return costs.get("" + a.charAt(i) + b.charAt(j));
 	}
 	
 }

@@ -11,14 +11,13 @@ public class CP
         ArrayList<EPoint> EPoints = CPParser.readPoints( args[ 0 ] );
         Collections.sort( EPoints, (o1, o2) -> Double.compare( o1.x, o2.x ) );
         points = EPoints;
+        System.out.println( points.size() );
         final long ourBefore = System.currentTimeMillis();
         final int[] cp = ClosestPair( 0, points.size() - 1 );
         final long ourAfter = System.currentTimeMillis();
         final EuclideanPair pair = new EuclideanPair( points.get( cp[0]), points.get( cp[1] ) );
         System.out.println( ourAfter - ourBefore );
         System.out.println( pair.distance() );
-        System.out.printf( "Pair 1: (%f, %f)\n", pair.left.x, pair.left.y );
-        System.out.printf( "Pair 2: (%f, %f)\n", pair.right.x, pair.right.y );
     }
 
     private static ArrayList<EPoint> points;
@@ -32,7 +31,7 @@ public class CP
 
     public static int[] ClosestPair(int start, int end)
     {
-        switch (end - start + 1)
+        switch ((end - start) + 1)
         {
             case 3: // Only 3 EPoints - Base Case
                 return getClosestPairOf3( start, end );
@@ -47,7 +46,7 @@ public class CP
                  */
                 final int medianIndex = start + ((end - start) / 2);
                 final int[] closestLeftPair = ClosestPair( start, medianIndex );
-                final int[] closestRightPair = ClosestPair( medianIndex, end );
+                final int[] closestRightPair = ClosestPair( 1+medianIndex, end );
 
                 /**
                  * The distance for the closest pair on the left side

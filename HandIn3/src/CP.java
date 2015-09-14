@@ -10,13 +10,13 @@ public class CP
     {
         ArrayList<EPoint> EPoints = CPParser.readPoints( args[ 0 ] );
         Collections.sort( EPoints, (o1, o2) -> Double.compare( o1.x, o2.x ) );
-        final long ourBefore = System.currentTimeMillis();
         points = EPoints;
+        final long ourBefore = System.currentTimeMillis();
         final int[] cp = ClosestPair( 0, points.size() - 1 );
-        final EuclideanPair pair = new EuclideanPair( points.get( cp[0]), points.get( cp[1] ) );
         final long ourAfter = System.currentTimeMillis();
+        final EuclideanPair pair = new EuclideanPair( points.get( cp[0]), points.get( cp[1] ) );
         System.out.println( ourAfter - ourBefore );
-        System.out.println(pair.distance());
+        System.out.println( pair.distance() );
         System.out.printf( "Pair 1: (%f, %f)\n", pair.left.x, pair.left.y );
         System.out.printf( "Pair 2: (%f, %f)\n", pair.right.x, pair.right.y );
     }
@@ -40,38 +40,52 @@ public class CP
                 return new int[] { start, end };
             case 1: // We can't handle this shit!
                 System.exit( -2 );
-                break;
+                return null;
             default:
+                /**
+                 * The index into the points array.
+                 */
                 final int medianIndex = start + ((end - start) / 2);
                 final int[] closestLeftPair = ClosestPair( start, medianIndex );
                 final int[] closestRightPair = ClosestPair( medianIndex, end );
 
-                EPoint leftPoint = points.get( closestLeftPair[ 0 ] );
-                EPoint rightPoint = points.get( closestLeftPair[1] );
-                final double d1 = distance( leftPoint, rightPoint );
+                /**
+                 * The distance for the closest pair on the left side
+                 */
+                final double distanceLeft = distance(   points.get( closestLeftPair[ 0 ] ),
+                                                        points.get( closestLeftPair[ 1 ] ) );
+                /**
+                 * The distance for the closest pair on the right side
+                 */
+                final double distanceRight = distance(  points.get( closestRightPair[ 0 ] ),
+                                                        points.get( closestRightPair[ 1 ] ) );
 
-                EPoint leftPoint1 = points.get( closestRightPair[ 0 ] );
-                EPoint rightPoint1 = points.get( closestRightPair[1] );
-                final double d2 = distance( leftPoint1, rightPoint1 );
-
-                double delta; // = Math.min( closestLeftPair.distance(), closestRightPair.distance() );
-                int p1 = -1, p2 = -1;
-                if (d1 < d2)
+                double delta;
+                int p1, p2;
+                if (distanceLeft < distanceRight)
                 {
                     p1 = closestLeftPair[0];
                     p2 = closestLeftPair[1];
-                    delta = d1;
+                    delta = distanceLeft;
                 }
                 else {
                     p1 = closestRightPair[0];
                     p2 = closestRightPair[1];
-                    delta = d2;
+                    delta = distanceRight;
                 }
 
+                /**
+                 * The actual median on the X axis.
+                 */
                 final double medianX = points.get( medianIndex ).x;
                 final int lowerBound = (int) (medianX - delta);
                 final int upperBound = (int) (medianX + delta);
 
+                /*
+                 * We compare each point from start to end (excluding)
+                 * around the L line (which is the points we haven't
+                 * considered yet).
+                 */
                 for (int i = start; i < end; i++)
                 {
                     final EPoint p = points.get( i );
@@ -81,7 +95,8 @@ public class CP
                     }
                     for (int j = i+1; j < end; j++)
                     {
-                        final double distance = points.get( j ).distance( p );
+                        final double distance = points.get( j )
+                                                      .distance( p );
                         if (distance < delta)
                         {
                             p1 = i;
@@ -90,10 +105,8 @@ public class CP
                         }
                     }
                 }
-
                 return new int[] { p1, p2 };
         }
-        return null;
     }
 
     private static int[] getClosestPairOf3(int start, int end)

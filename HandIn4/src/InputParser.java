@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
 public class InputParser {
@@ -15,11 +16,23 @@ public class InputParser {
 		
 		Map<String, String> result = readFromFile(args[0]);
 		
-		System.out.println("Sz = "+result.size());
+		Map<String, Integer> costs = readCosts("gorilla_data/BLOSUM62.txt");
 		
-		for (String k : result.keySet()) {
-			System.out.println(  "["+k+"]: "+result.get(k) );
+		System.out.println("Sz = "+costs.size());
+		
+//		int[][] res = Matcher.compare( result.get("sphinx"), result.get("snark") );
+		
+		for (Entry<String, Integer> e : costs.entrySet() ) {
+			System.out.println(  "["+e.getKey()+"]: "+e.getValue() );
 		}
+		
+//		for (int i = 0; i < res.length; i++) {
+//			System.out.print("R"+i+" ");
+//			for (int j = 0; j < res[i].length; j++) {
+//				System.out.print( res[i][j]+" ");
+//			}
+//			System.out.println("");
+//		}
 	}
 	
 	private static Scanner s;
@@ -30,10 +43,40 @@ public class InputParser {
 		return readSequences();
 	}
 	
+	private static Map<String, Integer> readCosts(String filename) throws FileNotFoundException {
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		String line;
+		String[] vertHd, horiHd;
+		try(Scanner s = new Scanner( new File(filename), "UTF-8" ) ) {
+			line = s.nextLine();
+			String tmp[];
+			while(line.contains("#") ) line = s.nextLine();
+			
+			//consume first line
+			tmp = line.split("[ ]+");
+			horiHd = tmp;
+			vertHd = tmp;
+			int i = 1;
+			line = s.nextLine();				
+			while( s.hasNextLine() ) {
+				tmp = line.split("[ ]+");
+				for (int j = 1; j < vertHd.length; j++) {
+					result.put(	""+vertHd[i]+horiHd[j],
+								Integer.parseInt( tmp[j] )
+								);
+				}
+				line = s.nextLine();
+				i++;
+			}
+			
+			
+		}
+		return result;
+	}
 	
 	private static Map<String,String> readSequences() {
 		Map<String, String> sequences = new HashMap<>();
-		String regx = "[>][A-Za-z]+\\s+[\\d]+[\\s]+[A-Z]+\\s+[\\d]?[A-Z]+", line = s.nextLine();
+		String line = s.nextLine();
 		String[] name;
 		StringBuilder seqBuilder = new StringBuilder();
 
@@ -46,17 +89,18 @@ public class InputParser {
 		}
 		
 		while( s.hasNextLine() ) {
+			line = s.nextLine();
 			if( line.startsWith(">") ) {
-				sequences.put( (name[0]).substring(1), seqBuilder.toString() );
+				sequences.put( (name[0]).substring(1).toLowerCase(), seqBuilder.toString() );
 				name = line.split(" ");
 				seqBuilder = new StringBuilder();
 			}
 			else {
 				seqBuilder.append( line );
 			}
-			line = s.nextLine();
 
 		}
+		sequences.put( (name[0]).substring(1).toLowerCase(), seqBuilder.toString() );
 
 		return sequences;
 	}

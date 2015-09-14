@@ -43,7 +43,7 @@ public class InputParser {
 		return readSequences();
 	}
 	
-	private static Map<String, Integer> readCosts(String filename) throws FileNotFoundException {
+	public static Map<String, Integer> readCosts(String filename) {
 		Map<String, Integer> result = new HashMap<String, Integer>();
 		String line;
 		String[] vertHd, horiHd;
@@ -61,7 +61,7 @@ public class InputParser {
 			while( s.hasNextLine() ) {
 				tmp = line.split("[ ]+");
 				for (int j = 1; j < vertHd.length; j++) {
-					result.put(	""+vertHd[i]+horiHd[j],
+					result.put(	""+vertHd[i].toLowerCase()+horiHd[j].toLowerCase(),
 								Integer.parseInt( tmp[j] )
 								);
 				}
@@ -70,7 +70,8 @@ public class InputParser {
 			}
 			
 			
-		}
+		} catch(FileNotFoundException e) {}
+
 		return result;
 	}
 	

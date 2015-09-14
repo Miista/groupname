@@ -46,7 +46,7 @@ public class CP
                  */
                 final int medianIndex = start + ((end - start) / 2);
                 final int[] closestLeftPair = ClosestPair( start, medianIndex );
-                final int[] closestRightPair = ClosestPair( 1+medianIndex, end );
+                final int[] closestRightPair = ClosestPair( medianIndex+1, end );
 
                 /**
                  * The distance for the closest pair on the left side

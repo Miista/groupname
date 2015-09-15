@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 public class Matcher {
 
 	final static int delta = 2;
-	static Map<String, Integer> costs = InputParser.readCosts("gorilla_data/BLOSUM62.txt");
+	public static Map<String, Integer> costs = InputParser.readCosts("gorilla_data/BLOSUM62.txt");
 	static String a, b;
 	static int[][] vals;
 
@@ -32,7 +32,7 @@ public class Matcher {
 		return vals;
 	}
 
-	private static int optimal(int i, int j) {
+	public static int optimal(int i, int j) {
 		if (i==0) {
 			return j*delta;
 		}

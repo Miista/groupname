@@ -1,202 +1,136 @@
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
- * Created by Søren Palmund on 07-09-2015.
+ * Created by Sï¿½ren Palmund on 07-09-2015.
+ * @param <T>
  */
 public class CP
 {
-    public static void main(String[] args) throws FileNotFoundException
-    {
-        ArrayList<EPoint> EPoints = CPParser.readPoints( args[ 0 ] );
-        Collections.sort( EPoints, (o1, o2) -> Double.compare( o1.x, o2.x ) );
-        points = EPoints;
-        System.out.println( "Number of points: "+points.size() );
-        final long ourBefore = System.currentTimeMillis();
-        final int[] cp = ClosestPair( 0, points.size() - 1 );
-        final long ourAfter = System.currentTimeMillis();
-        final EuclideanPair pair = new EuclideanPair( points.get( cp[0]), points.get( cp[1] ) );
-        System.out.println( "O: " + (ourAfter - ourBefore) );
-        System.out.println( pair.distance() );
-    }
+	public static class Tuple<X,Y> {
+		final public X val1;
+		final public Y val2;
 
-    private static ArrayList<EPoint> points;
+		public Tuple(X x, Y y) {
+			this.val1 = x;
+			this.val2 = y;
+		}
+	}
 
-    public static double distance(EPoint p1, EPoint p2)
-    {
-        final double y = Math.abs( p1.y - p2.y );
-        final double x = Math.abs( p1.x - p2.x );
-        return Math.sqrt( y * y + x * x );
-    }
+	public static class EPoint
+	{
+		public final double x, y;
 
-    public static int[] ClosestPair(int start, int end)
-    {
-        switch ((end - start) + 1)
-        {
-            case 3: // Only 3 EPoints - Base Case
-                return getClosestPairOf3( start, end );
-            case 2:
-                return new int[] { start, end };
-            case 1: // We can't handle this shit!
-                System.exit( -2 );
-                return null;
-            default:
-                /**
-                 * The index into the points array.
-                 */
-                final int medianIndex = start + ((end - start) / 2);
-                final int[] closestLeftPair = ClosestPair( start, medianIndex );
-                final int[] closestRightPair = ClosestPair( medianIndex+1, end );
+		public EPoint(double x, double y)
+		{
+			this.x = x;
+			this.y = y;
+		}
 
-                /**
-                 * The distance for the closest pair on the left side
-                 */
-                final double distanceLeft = distance(   points.get( closestLeftPair[ 0 ] ),
-                                                        points.get( closestLeftPair[ 1 ] ) );
-                /**
-                 * The distance for the closest pair on the right side
-                 */
-                final double distanceRight = distance(  points.get( closestRightPair[ 0 ] ),
-                                                        points.get( closestRightPair[ 1 ] ) );
+		public double distance(EPoint other)
+		{
+			final double y = Math.abs( this.y - other.y );
+			final double x = Math.abs( this.x - other.x );
+			return Math.sqrt( y * y + x * x );
+		}
+	}
 
-                double delta;
-                int p1, p2;
-                if (distanceLeft < distanceRight)
-                {
-                    p1 = closestLeftPair[0];
-                    p2 = closestLeftPair[1];
-                    delta = distanceLeft;
-                }
-                else {
-                    p1 = closestRightPair[0];
-                    p2 = closestRightPair[1];
-                    delta = distanceRight;
-                }
+	public static void main(String[] args) throws FileNotFoundException
+	{
+		System.out.println("Read file: "+args[0]);
 
-                /**
-                 * The actual median on the X axis.
-                 */
-                final double medianX = points.get( medianIndex ).x;
-                final int lowerBound = (int) (medianX - delta);
-                final int upperBound = (int) (medianX + delta);
+		ArrayList<EPoint> EPoints = CPParser.readPoints( args[ 0 ] );
+		Collections.sort( EPoints, (o1, o2) -> Double.compare( o1.x, o2.x ) );
+		System.out.println( "Number of points: "+EPoints.size() );
 
-                /*
-                 * We compare each point from start to end (excluding)
-                 * around the L line (which is the points we haven't
-                 * considered yet).
-                 */
-                for (int i = start; i < end; i++)
-                {
-                    final EPoint p = points.get( i );
-                    if (p.x <= lowerBound || p.x >= upperBound)
-                    {
-                        continue;
-                    }
-                    for (int j = i+1; j < end; j++)
-                    {
-                        final double distance = points.get( j )
-                                                      .distance( p );
-                        if (distance < delta)
-                        {
-                            p1 = i;
-                            p2 = j;
-                            delta = distance;
-                        }
-                    }
-                }
-                return new int[] { p1, p2 };
-        }
-    }
+		final long ourBefore = System.currentTimeMillis();
+		final Tuple<Double, List<EPoint>> result = ClosestPair( EPoints );
+		final long ourAfter = System.currentTimeMillis();
 
-    private static int[] getClosestPairOf3(int start, int end)
-    {
-        final EPoint A = points.get( start );
-        final EPoint B = points.get( start+1 );
-        final EPoint C = points.get( end );
-        final double ab = A.distance( B );
-        final double bc = B.distance( C );
-        final double ca = C.distance( A );
+		System.out.println( "O: " + (ourAfter - ourBefore) );
+		System.out.println( "Delta: "+result.val1 );
+	}
 
-        int left, right;
-        if (ab < bc)
-        {
-            left = start;
-            right = start+1;
-        } else
-        {
-            left = start+1;
-            right = end;
-        }
-        if (ca < ab)
-        {
-            left = start;
-            right = end;
-        }
+	private static Tuple<Double, List<EPoint> > closestOf3( List<EPoint> list) {
+		double d01 = list.get(0).distance( list.get(1) );
+		double d02 = list.get(0).distance( list.get(2) );
+		double delta = d01 < d02 ? d01 : d02;
 
-        return new int[] { left, right };
-    }
+		//Sort the elements
+		if( list.get(0).y > list.get(1).y) Collections.swap(list, 0, 1); // compares 2 first elements , makes sure theyre in order
+		if( list.get(1).y > list.get(2).y) Collections.swap(list, 1, 2); // compares 2 last elements, make sure they are in order
+		if( list.get(0).y > list.get(1).y) Collections.swap(list, 0, 1); // compares 2 first again, in case order has been altered
 
-    private static EuclideanPair getClosestPairOf3(List<EPoint> EPoints)
-    {
-        final EPoint A = EPoints.get( 0 );
-        final EPoint B = EPoints.get( 1 );
-        final EPoint C = EPoints.get( 2 );
-        final double ab = A.distance( B );
-        final double bc = B.distance( C );
-        final double ca = C.distance( A );
-        EPoint left, right;
-        if (ab < bc)
-        {
-            left = A;
-            right = B;
-        } else
-        {
-            left = B;
-            right = C;
-        }
-        if (ca < ab)
-        {
-            left = A;
-            right = C;
-        }
+		return new Tuple<Double, List<EPoint> >(delta, list);
+	}
 
-        return new EuclideanPair( left, right );
-    }
+	public static Tuple<Double, List<EPoint> > ClosestPair( List<EPoint> input )
+	{
+		Double delta;
+		switch ( input.size() )
+		{
+		case 3: // Only 3 EPoints - Base Case
+			return closestOf3( input );
+		case 2:
+			if( input.get(0).y > input.get(1).y ) Collections.swap(input, 0, 1);
+			delta = input.get(0).distance( input.get(1) );
+			return new Tuple<Double, List<EPoint> >(delta, input);
+		case 1: // This should not occur - only if the given list only has 1 point
+			System.out.println("Hit 1 element in queue");
+			System.exit( -2 );
+			return null;
+		default:
+			/**
+			 * We partition the input into 2 subsets.
+			 */
+			final int medianIndex = input.size() / 2;
+			final Tuple<Double, List<EPoint> > Q = ClosestPair( input.subList(0, medianIndex) );
+			final Tuple<Double, List<EPoint> > R = ClosestPair( input.subList(medianIndex, input.size()) );
 
-    public static class EPoint
-    {
-        public final double x, y;
+			/**
+			 * We find the smallest delta based on the subsets
+			 */
+			delta = Math.min(Q.val1, R.val1);
 
-        public EPoint(double x, double y)
-        {
-            this.x = x;
-            this.y = y;
-        }
+			/**
+			 * Stitching the 2 presorted y-lists
+			 */
+			List<EPoint> recombine = new ArrayList<EPoint>(Q.val2.size()+R.val2.size());
+			ListIterator<EPoint> Qp = Q.val2.listIterator(), Rp = R.val2.listIterator(); 
+			EPoint qp, rp;
+			for (int i = 0; i < input.size(); i++) {
+				if( Qp.hasNext() ) {
+					qp = Qp.next();
+					if( Rp.hasNext() ) {
+						rp = Rp.next();
+						if(qp.y < rp.y) recombine.add( qp );
+						else recombine.add( rp );
+					}
+					else recombine.add( qp );
+				}
+				else {
+					if( Rp.hasNext() ) {
+						rp = Rp.next();
+						recombine.add( rp );							
+					}
+				}
+			}
 
-        public double distance(EPoint other)
-        {
-            final double y = Math.abs( this.y - other.y );
-            final double x = Math.abs( this.x - other.x );
-            return Math.sqrt( y * y + x * x );
-        }
-    }
+		for (int i = 0; i < recombine.size(); i++) {
+			EPoint pt = recombine.get(i);
+			Double dist;
+			for(int j = i+1; j < (i+1)+15; j++) {
+				if(j == recombine.size()) break;
+				dist = pt.distance( recombine.get(j) );
+				delta = dist < delta ? dist : delta;
+			}
+		}
 
-    public static class EuclideanPair
-    {
-        public EPoint left;
-        public EPoint right;
+		return new Tuple<Double, List<EPoint> >( delta , recombine );
+	}
+}
 
-        public EuclideanPair(EPoint left, EPoint right)
-        {
-            this.left = left;
-            this.right = right;
-        }
-
-        public double distance()
-        {
-            final double y = Math.abs( left.y - right.y );
-            final double x = Math.abs( left.x - right.x );
-            return Math.sqrt( y * y + x * x );
-        }
-    }
 }

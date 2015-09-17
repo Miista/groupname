@@ -8,9 +8,11 @@ import java.util.Scanner;
  */
 public class CPParser
 {
+	
+
+	
     public static ArrayList<CP.EPoint> readPoints(String filename) throws FileNotFoundException
     {
-        int i = 0;
         Scanner s = new Scanner( new File( filename ) );
         ArrayList<CP.EPoint> points = new ArrayList<>();
         String[] job;
@@ -20,12 +22,11 @@ public class CPParser
             {
                 continue;
             }
-            job = line
-                   .split( " +" );
-//            System.out.println(line);
+            job = line.split( "[\\s]+" );
             points.add( new CP.EPoint( Double.parseDouble( job[ 1 ] ), Double.parseDouble( job[ 2 ] ) ) );
-            i++;
         }
+
+        s.close();
         return points;
     }
 }

@@ -5,6 +5,10 @@
 \usepackage{booktabs}
 \usepackage{microtype}
 
+\newcommand{\tuple}[1]{\langle#1\rangle}
+\newcommand{\floor}[1]{\lfloor#1\rfloor}
+\newcommand{\ceil}[1]{\lceil#1\rceil}
+
 \pagestyle{empty}
 
 
@@ -38,25 +42,28 @@
   
   We call the method \verb+ClosestPair+ which takes as input a list of points sorted by X-values , called $input$. The above method returns the smallest distance between two points, named $delta$ and a y-sorted list of the inputted points in increasing order. \newline
 
-Hence our method signature is as follows: \newline
- \verb+Tuple<Double, List<EPoint>> ClosestPair(List<EPoint> input)+
-  
+Hence our method signature is as follows: $ClosestPair(points) \rightarrow \tuple{Double, points}$\newline
+\noindent
  The method examines the number of points that are in the given $input$ list.\newline
 
 We have three different cases:\newline \bigskip
-\[opt(n) = 
-\begin{cases}
-    min(n_0, n_1, n_2)       & \quad \text{if  } |n| = 3\\
-    min(n_0, n_1) & \quad \text{if } |n| = 2 \\
-    opt( \lceil n/2 \rceil ) + opt( \lfloor n/2 \rfloor ) & \quad \text{otherwise} \\
-  \end{cases}\] \newline
-  \bigskip
+\[
+    opt(n) = 
+    \begin{cases}
+    	min(n_0, n_1, n_2)       			& \quad \text{if } |n| = 3\\
+        min(n_0, n_1) 					& \quad \text{if } |n| = 2 \\
+        opt( \ceil{n/2} ) + opt( \floor{n/2} )	& \quad \text{otherwise (default)} \\
+    \end{cases}
+\]\newline
+
+\bigskip
 \textbf{In-Depth of default case:}\newline
 The split we do results in the two subsets, $m$ is the median of input\newline
   $Q = \lbrack 0 .. m \lbrack $\newline
   $R = \lbrack m .. input_{sz} \lbrack$ \newline 
 
-These subsets are obtained by recursively calling \verb+ClosestPair+, the return type is a tuple which contains the smallest possible $delta$ and the Y-sorted $input$ for that recursive call.
+These subsets are obtained by recursively calling \verb+ClosestPair+, the return type 
+is a tuple which contains the smallest possible $delta$ and the Y-sorted $input$ for that recursive call.
 
 We then set the delta $\delta = min(delta_{Q}, delta_{R})$.\newline
 
@@ -67,18 +74,21 @@ We allocate a new list $recombine$, and do a mergesort on \newline $Q_{y sort} \
 
 The result of the above is the $recombine$ list.\newline
 
-Using $\delta$ we compute the range on the X-axis around $m$ (in the range $m \pm \delta$) which might hold pairs that are closer than what we've found so far.
+Using $\delta$ we compute the range on the X-axis around $m$ (in the range $m \pm \delta$) which 
+might hold pairs that are closer than what we've found so far.
 To help with this we compute upper bound and lower bounds on the X-values.\newline
-For any points within these bounds in the $recombine$ list, we compare the distance between the point and the 15 following points.
+For any points within these bounds in the $recombine$ list, we compare the distance between the point
+ and the 15 following points.
 If the distance is smaller than $\delta$ we update $\delta$ to be the smallest one.
 
 \subsection{Run time}
 By taking a closer look into our code, it seems as the majority of work is evenly divided throughout all the recursions.
 
-We seem to spend linear time at each level during the merge of the sorted lists, and linear time to compare a given point to its 15 neighbours.
-This is $n + 15n$.\newline At the 4 lowest recursion levels we might compare less than 15.
+We seem to spend linear time at each level during the merge of the sorted lists, and linear time to 
+compare a given point to its 15 neighbours.
+This is $n + 15n$.\newline At the 4 bottom-most recursion levels we might compare less than 15.
 
-Seeing the input is halved at every recursion we have a $log n$ runtime, combined with the fact that we do linear amount of work for every recursion we expect our running time to be $O(n\log n)$ for $n$ points.
-
+Seeing the input is halved at every recursion we have a $log n$ runtime, combined with the fact that we 
+do linear amount of work for every recursion we expect our running time to be $O(n\log n)$ for $n$ points.
 
 \end{document}

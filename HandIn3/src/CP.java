@@ -98,38 +98,28 @@ public class CP
 			/**
 			 * Stitching the 2 presorted y-lists
 			 */
-			List<EPoint> recombine = new ArrayList<EPoint>(Q.val2.size()+R.val2.size());
-			ListIterator<EPoint> Qp = Q.val2.listIterator(), Rp = R.val2.listIterator(); 
-			EPoint qp, rp;
-			for (int i = 0; i < input.size(); i++) {
-				if( Qp.hasNext() ) {
-					qp = Qp.next();
-					if( Rp.hasNext() ) {
-						rp = Rp.next();
-						if(qp.y < rp.y) recombine.add( qp );
-						else recombine.add( rp );
+			List<EPoint> recombine = new ArrayList<>( Q.val2.size() + R.val2.size() );
+			recombine.addAll( Q.val2 );
+			recombine.addAll( R.val2 );
+			recombine.sort( (o1, o2) -> Double.compare( o1.y, o2.y ) );
+
+			for (int i = 0; i < recombine.size(); i++)
+			{
+				EPoint pt = recombine.get( i );
+				Double dist;
+				for (int j = i + 1; j < (i + 1) + 15; j++)
+				{
+					if (j == recombine.size()) break;
+					dist = pt.distance( recombine.get( j ) );
+					if (dist == 0.0)
+					{
+						continue;
 					}
-					else recombine.add( qp );
-				}
-				else {
-					if( Rp.hasNext() ) {
-						rp = Rp.next();
-						recombine.add( rp );							
-					}
+					delta = dist < delta ? dist : delta;
 				}
 			}
 
-		for (int i = 0; i < recombine.size(); i++) {
-			EPoint pt = recombine.get(i);
-			Double dist;
-			for(int j = i+1; j < (i+1)+15; j++) {
-				if(j == recombine.size()) break;
-				dist = pt.distance( recombine.get(j) );
-				delta = dist < delta ? dist : delta;
-			}
-		}
-
-		return new Tuple<Double, List<EPoint> >( delta , recombine );
+		return new Tuple<>( delta, recombine );
 	}
 }
 

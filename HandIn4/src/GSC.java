@@ -1,7 +1,6 @@
 /**
  * Created by Sren Palmund on 14-09-2015.
  */
-import javafx.util.Pair;
 
 import java.awt.Point;
 import java.io.FileNotFoundException;
@@ -10,14 +9,16 @@ import java.util.*;
 public class GSC
 {
 
-    private static ArrayList<Pair<Point, Point>> pairs = new ArrayList<>(  );
     private static Point[][] path;
+    private static Map<String, Integer> alpha = Matcher.costs;
+    private static final int delta = -4;
+    private static char[] x, y;
 
     public static void main(String[] args) throws FileNotFoundException {
         String a = "KQRK";
         String b = "KAK";
         final long start = System.currentTimeMillis();
-        final Tuple<Integer, Point[]> value = sequenceAlignment( a, b, -4, Matcher.costs );
+        final Tuple<Integer, Point[]> value = sequenceAlignment( a, b );
         final long stop = System.currentTimeMillis();
         System.out.println( "O: "+(stop-start) );
 
@@ -61,11 +62,9 @@ public class GSC
      *
      * @param a
      * @param b
-     * @param delta
-     * @param alpha
      * @return
      */
-    private static Tuple<Integer, Point[]> sequenceAlignment(String a, String b, int delta, Map<String, Integer> alpha) {
+    private static Tuple<Integer, Point[]> sequenceAlignment(String a, String b) {
         final String A = "-"+a;
         final String B = "-"+b;
         final int m = A.length();
@@ -74,7 +73,10 @@ public class GSC
         final char[] ns = B.toCharArray();
         final char[] ms = A.toCharArray();
 
-        doIt( ns, ms, delta, alpha );
+        x = ns;
+        y = ms;
+
+        doIt( x, y );
 
         final Point[] _path = new Point[Math.max( m, n )-1];
         Point p;
@@ -96,7 +98,7 @@ public class GSC
     }
 
     static int[][] M;
-	private static void doIt(char[] x, char[] y, int delta, Map<String, Integer> alpha)
+	private static void doIt(char[] x, char[] y)
     {
         path = new Point[x.length][y.length];
         M = new int[x.length][y.length];
@@ -120,12 +122,12 @@ public class GSC
         {
             for (int j = 1; j < y.length; j++)
             {
-                M[i][j] = OPT(x, y, i, j, alpha, delta );
+                M[i][j] = OPT( i, j );
             }
         }
     }
 
-    private static int OPT(char[] x, char[] y, int i, int j, Map<String, Integer> alpha, int delta)
+    private static int OPT(int i, int j)
     {
         if (M[i][j] != -999)
         {
@@ -146,9 +148,9 @@ public class GSC
         char c2 = y[j];
         String s = ("" + c1 + c2).toLowerCase();
         final Integer _alpha = alpha.getOrDefault( s, 0 );
-        final int _alphaPlus = _alpha + OPT( x, y, i-1, j-1, alpha, delta );
-        final int _deltaIMinus = delta + OPT( x, y, i-1, j, alpha, delta );
-        final int _deltaJMinus = delta + OPT( x, y, i, j-1, alpha, delta );
+        final int _alphaPlus = _alpha + OPT( i-1, j-1 );
+        final int _deltaIMinus = delta + OPT( i-1, j );
+        final int _deltaJMinus = delta + OPT( i, j-1 );
 
         if (_alphaPlus > _deltaIMinus && _alphaPlus > _deltaJMinus)
         {
@@ -172,30 +174,6 @@ public class GSC
         return Math.max( _alphaPlus,
                 Math.max( _deltaIMinus,
                         _deltaJMinus ) );
-    }
-
-    private static void printThem(char[] x, char[] y)
-    {
-        System.out.println( "=================================" );
-
-        System.out.printf( "%-6c", ' ' );
-        for (char c : y)
-        {
-            System.out.printf( "%-6c", c );
-        }
-        System.out.println();
-        for (int i = 0; i < M.length; i++)
-        {
-            int[] ints = M[ i ];
-            System.out.printf( "%-6c", x[ i ] );
-            for (int anInt : ints)
-            {
-                System.out.printf( "%-5d ", anInt );
-            }
-            System.out.println();
-        }
-        System.out.println();
-        System.out.println("=================================");
     }
 
     public static class Tuple<T1, T2> {

@@ -6,56 +6,69 @@ import javafx.util.Pair;
 import java.awt.Point;
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class GSC
 {
 
     private static ArrayList<Pair<Point, Point>> pairs = new ArrayList<>(  );
+    private static Point[][] path;
 
     public static void main(String[] args) throws FileNotFoundException {
 		final String A = "-KQRK";
-        final String B = "-KAK";
+        final String B = "-KQRIKAAKABK";
         final int m = A.length();
         final int n = B.length();
-        doIt( A.toCharArray(), B.toCharArray(), -4, Matcher.costs );
 
-        ArrayList<Pair<Point, Point>> route = new ArrayList<>(  );
-        Collections.reverse( pairs );
-        Point lookupValue = new Point( m-1, n-1 );
-        for (Pair<Point, Point> pair : pairs)
+        final char[] ns = B.toCharArray();
+        final char[] ms = A.toCharArray();
+
+        final long start = System.currentTimeMillis();
+        doIt( ns, ms, -4, Matcher.costs );
+        final long stop = System.currentTimeMillis();
+        System.out.println( "O: "+(stop-start) );
+
+        System.out.println("Score: "+M[n-1][m-1]);
+
+        final Point[] _path = new Point[Math.max( m, n )];
+        Point p;
+        int i = n-1, j = m-1, z = _path.length-1;
+        _path[z--] = new Point( i, j );
+
+        do { // Fill up the array from the end
+            p = path[i][j];
+            _path[z--] = p;
+            i = p.x;
+            j = p.y;
+        } while ( z >= 0 );
+
+        Point last = _path[0];
+        for (Point point : _path)
         {
-            if (pair.getValue().x == lookupValue.x && pair.getValue().y == lookupValue.y)
-            {
-                route.add( pair );
-                if (pair.getKey().x == 0 && pair.getKey().y == 0)
-                {
-                    break;
-                }
-                lookupValue = pair.getKey();
-            }
-        }
-        Collections.reverse( route );
-        route.stream().mapToInt( value -> value.getValue().x ).forEach( value1 -> System.out.print( A.charAt( value1 ) ) );
-        System.out.println();
-        final IntStream intStream = route.stream()
-                                         .mapToInt( value -> value.getValue().y );
-        final PrimitiveIterator.OfInt iterator = intStream.iterator();
-        int last = 0;
-        while (iterator.hasNext()){
-            final Integer next = iterator.next();
-            if (next == last) {
-                System.out.printf( "-" );
+            if (Math.abs( point.y - last.y ) == 1){
+                System.out.print( ms[ point.y ] );
             }else{
-                System.out.print( B.charAt( next ) );
+                System.out.print( "-" );
             }
-            last = next;
+            last = point;
         }
+        System.out.println();
+        last = _path[0];
+        for (Point point : _path)
+        {
+            if (Math.abs( point.x - last.x ) == 1){
+                System.out.print( ns[ point.x ] );
+            }else{
+                System.out.print( "-" );
+            }
+            last = point;
+        }
+        System.out.println();
     }
 
     static int[][] M;
 	private static void doIt(char[] x, char[] y, int delta, Map<String, Integer> alpha)
     {
+        path = new Point[x.length][y.length];
         M = new int[x.length][y.length];
         for (int[] ints : M)
         {
@@ -64,25 +77,24 @@ public class GSC
         for (int i = 0; i < x.length; i++)
         {
             M[i][0] = i*delta;
-            pairs.add( new Pair<>( new Point( i-1, 0 ), new Point( i, 0 ) ) );
+            path[i][0] = new Point( i-1, 0 );
         }
 
         for (int j = 0; j < y.length; j++)
         {
             M[0][j] = j*delta;
-            pairs.add( new Pair<>( new Point( 0, j-1 ), new Point( 0, j ) ) );
+            path[0][j] = new Point( 0, j );
         }
-//        printThem( x, y, M );
 
         for (int i = 1; i < x.length; i++)
         {
             for (int j = 1; j < y.length; j++)
             {
                 M[i][j] = OPT(x, y, i, j, alpha, delta );
-                printThem( x, y, M );
+                printThem( x, y );
             }
         }
-        printThem( x, y, M );
+//        printThem( x, y, M );
     }
 
     private static int OPT(char[] x, char[] y, int i, int j, Map<String, Integer> alpha, int delta)
@@ -113,24 +125,20 @@ public class GSC
         if (_alphaPlus > _deltaIMinus && _alphaPlus > _deltaJMinus)
         {
             final Point parent = new Point( i - 1, j - 1 );
-            final Point us = new Point( i, j );
-            pairs.add( new Pair<>( parent, us ) );
+            path[i][j] = parent;
         }
         else if (_alphaPlus > _deltaIMinus && _alphaPlus < _deltaJMinus)
         {
             final Point parent = new Point( i, j-1 );
-            final Point us = new Point( i, j );
-            pairs.add( new Pair<>( parent, us ) );
+            path[i][j] = parent;
         }
         else if (_deltaIMinus > _deltaJMinus)
         {
             final Point parent = new Point( i-1, j );
-            final Point us = new Point( i, j );
-            pairs.add( new Pair<>( parent, us ) );
+            path[i][j] = parent;
         } else {
             final Point parent = new Point( i, j-1 );
-            final Point us = new Point( i, j );
-            pairs.add( new Pair<>( parent, us ) );
+            path[i][j] = parent;
         }
 
         return Math.max( _alphaPlus,
@@ -138,7 +146,7 @@ public class GSC
                         _deltaJMinus ) );
     }
 
-    private static void printThem(char[] x, char[] y, int[][] m)
+    private static void printThem(char[] x, char[] y)
     {
         System.out.println( "=================================" );
 
@@ -148,9 +156,9 @@ public class GSC
             System.out.printf( "%-6c", c );
         }
         System.out.println();
-        for (int i = 0; i < m.length; i++)
+        for (int i = 0; i < M.length; i++)
         {
-            int[] ints = m[ i ];
+            int[] ints = M[ i ];
             System.out.printf( "%-6c", x[ i ] );
             for (int anInt : ints)
             {

@@ -14,55 +14,85 @@ public class GSC
     private static Point[][] path;
 
     public static void main(String[] args) throws FileNotFoundException {
-		final String A = "-KQRK";
-        final String B = "-KQRIKAAKABK";
+        String a = "KQRK";
+        String b = "KAK";
+        final long start = System.currentTimeMillis();
+        final Tuple<Integer, Point[]> value = sequenceAlignment( a, b, -4, Matcher.costs );
+        final long stop = System.currentTimeMillis();
+        System.out.println( "O: "+(stop-start) );
+
+        System.out.println( value.item1 );
+
+        final char[] as = a.toCharArray();
+        final char[] bs = b.toCharArray();
+        final Point[] _path = value.item2;
+        Point last = new Point( 0, 0 );
+        for (Point point : _path)
+        {
+            if (Math.abs( point.y - last.y ) == 1)
+            {
+                System.out.print( as[ point.y-1 ] );
+            } else
+            {
+                System.out.print( "-" );
+            }
+            last = point;
+        }
+        System.out.println();
+        last = new Point( 0, 0 );
+        for (Point point : _path)
+        {
+            if (Math.abs( point.x - last.x ) == 1)
+            {
+                System.out.print( bs[ point.x-1 ] );
+            } else
+            {
+                System.out.print( "-" );
+            }
+            last = point;
+        }
+        System.out.println();
+    }
+
+    /**
+     * The Point array that is returned contains the path that is the optimal alignment.
+     * The y-values of each point corresponds to the index in a, while x-values are the
+     * index into b.
+     *
+     * @param a
+     * @param b
+     * @param delta
+     * @param alpha
+     * @return
+     */
+    private static Tuple<Integer, Point[]> sequenceAlignment(String a, String b, int delta, Map<String, Integer> alpha) {
+        final String A = "-"+a;
+        final String B = "-"+b;
         final int m = A.length();
         final int n = B.length();
 
         final char[] ns = B.toCharArray();
         final char[] ms = A.toCharArray();
 
-        final long start = System.currentTimeMillis();
-        doIt( ns, ms, -4, Matcher.costs );
-        final long stop = System.currentTimeMillis();
-        System.out.println( "O: "+(stop-start) );
+        doIt( ns, ms, delta, alpha );
 
-        System.out.println("Score: "+M[n-1][m-1]);
-
-        final Point[] _path = new Point[Math.max( m, n )];
+        final Point[] _path = new Point[Math.max( m, n )-1];
         Point p;
         int i = n-1, j = m-1, z = _path.length-1;
         _path[z--] = new Point( i, j );
 
         do { // Fill up the array from the end
             p = path[i][j];
+            if (p.x == 0 && p.y == 0)
+            {
+                break;
+            }
             _path[z--] = p;
             i = p.x;
             j = p.y;
         } while ( z >= 0 );
 
-        Point last = _path[0];
-        for (Point point : _path)
-        {
-            if (Math.abs( point.y - last.y ) == 1){
-                System.out.print( ms[ point.y ] );
-            }else{
-                System.out.print( "-" );
-            }
-            last = point;
-        }
-        System.out.println();
-        last = _path[0];
-        for (Point point : _path)
-        {
-            if (Math.abs( point.x - last.x ) == 1){
-                System.out.print( ns[ point.x ] );
-            }else{
-                System.out.print( "-" );
-            }
-            last = point;
-        }
-        System.out.println();
+        return new Tuple<>( M[n-1][m-1], _path );
     }
 
     static int[][] M;
@@ -91,10 +121,8 @@ public class GSC
             for (int j = 1; j < y.length; j++)
             {
                 M[i][j] = OPT(x, y, i, j, alpha, delta );
-                printThem( x, y );
             }
         }
-//        printThem( x, y, M );
     }
 
     private static int OPT(char[] x, char[] y, int i, int j, Map<String, Integer> alpha, int delta)
@@ -168,5 +196,15 @@ public class GSC
         }
         System.out.println();
         System.out.println("=================================");
+    }
+
+    public static class Tuple<T1, T2> {
+        final public T1 item1;
+        final public T2 item2;
+
+        public Tuple(T1 x, T2 y) {
+            this.item1 = x;
+            this.item2 = y;
+        }
     }
 }

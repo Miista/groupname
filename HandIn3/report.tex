@@ -69,10 +69,8 @@ We then set the delta $\delta = min(delta_{Q}, delta_{R})$.\newline
 
 We then merge the two lists of Y-sorted points returned from recursive calls, namely the $Q_{ysort}$ and $R_{ysort}$ lists.
 
-We allocate a new list $recombine$, and do a mergesort on \newline $Q_{y sort} \bigcup R_{y sort}$.
-
-
-The result of the above is the $recombine$ list.\newline
+We allocate a new list $recombine$, and do a mergesort, hence\newline $recombine = Q_{y sort} \bigcup R_{y sort}$.
+\newline
 
 Using $\delta$ we compute the range on the X-axis around $m$ (in the range $m \pm \delta$) which 
 might hold pairs that are closer than what we've found so far.
@@ -86,9 +84,9 @@ By taking a closer look into our code, it seems as the majority of work is evenl
 
 We seem to spend linear time at each level during the merge of the sorted lists, and linear time to 
 compare a given point to its 15 neighbours.
-This is $n + 15n$.\newline At the 4 bottom-most recursion levels we might compare less than 15.
+This is $15n$.\newline At the 4 bottom-most recursion levels we might compare less than 15.
 
-Seeing the input is halved at every recursion we have a $log n$ runtime, combined with the fact that we 
+Seeing the input is halved at every recursion we have a $\log n$ runtime, combined with the fact that we 
 do linear amount of work for every recursion we expect our running time to be $O(n\log n)$ for $n$ points.
 
 \end{document}

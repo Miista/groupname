@@ -8,25 +8,41 @@ import java.util.Scanner;
  */
 public class CPParser
 {
-	
 
-	
-    public static ArrayList<CP.EPoint> readPoints(String filename) throws FileNotFoundException
+
+    public static ArrayList<CP.EPoint> readPoints(String filename)
+    {return readPoints( new File( filename ) );}
+
+    public static ArrayList<CP.EPoint> readPoints(File filename)
     {
-        Scanner s = new Scanner( new File( filename ) );
-        ArrayList<CP.EPoint> points = new ArrayList<>();
-        String[] job;
-        while( s.hasNextLine() ) {
-            final String line = s.nextLine();
-            if ("".equals( line ) || line.contains( ":" ) || line.contains( "_" ) || line.contains( "EOF" ))
-            {
-                continue;
+        try
+        {
+            Scanner s = new Scanner( filename );
+            ArrayList<CP.EPoint> points = new ArrayList<>();
+            String[] job;
+            boolean canRead = !filename.getName().contains( "tsp" );
+            while( s.hasNextLine() ) {
+                final String line = s.nextLine();
+                if (filename.getName().contains( "tsp" ) && !canRead) {
+                    if ("NODE_COORD_SECTION".equals( line )) {
+                        canRead = true;
+                    }
+                    continue;
+                }
+                if ("".equals( line ) || line.contains( ":" ) || line.contains( "_" ) || line.contains( "EOF" ) || " ".equals( line ))
+                {
+                    continue;
+                }
+                job = line.split( "[\\s]+" );
+                points.add( new CP.EPoint( Double.parseDouble( job[ 1 ] ), Double.parseDouble( job[ 2 ] ) ) );
             }
-            job = line.split( "[\\s]+" );
-            points.add( new CP.EPoint( Double.parseDouble( job[ 1 ] ), Double.parseDouble( job[ 2 ] ) ) );
-        }
 
-        s.close();
-        return points;
+            s.close();
+            return points;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException( e );
+        }
     }
 }

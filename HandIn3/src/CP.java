@@ -1,8 +1,13 @@
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Collectors;
 
 /**
  * Created by Soren Palmund on 07-09-2015.
@@ -37,20 +42,26 @@ public class CP
 		}
 	}
 
-	public static void main(String[] args) throws FileNotFoundException
+	public static void main(String[] args) throws IOException
 	{
-		System.out.println("Read file: "+args[0]);
+		final List<File> collect = Files.walk( Paths.get( "cp-data" ) )
+									.filter( Files::isRegularFile )
+									.map( Path::toFile )
+									.filter( f -> f.getName()
+													.contains( "33810" ) )
+									.collect( Collectors.toList() );
 
-		ArrayList<EPoint> EPoints = CPParser.readPoints( args[ 0 ] );
-		Collections.sort( EPoints, (o1, o2) -> Double.compare( o1.x, o2.x ) );
-		System.out.println( "Number of points: "+EPoints.size() );
-
-		final long ourBefore = System.currentTimeMillis();
-		final Tuple<Double, List<EPoint>> result = ClosestPair( EPoints );
-		final long ourAfter = System.currentTimeMillis();
-
-		System.out.println( "O: " + (ourAfter - ourBefore) );
-		System.out.println( "Delta: "+result.val1 );
+		Tuple<Double, List<EPoint>> result;
+		ArrayList<EPoint> EPoints = null;
+		for (File file : collect)
+		{
+			System.out.println(file);
+			EPoints = CPParser.readPoints( file );
+			Collections.sort( EPoints, (o1, o2) -> Double.compare( o1.x, o2.x ) );
+			result = ClosestPair( EPoints );
+			System.out.println(file + ": "+EPoints.size()+" "+result.val1);
+			result = null;
+		}
 	}
 
 	private static Tuple<Double, List<EPoint> > closestOf3( List<EPoint> list) {

@@ -44,23 +44,36 @@ public class CP
 
 	public static void main(String[] args) throws IOException
 	{
-		final List<File> collect = Files.walk( Paths.get( "cp-data" ) )
-									.filter( Files::isRegularFile )
-									.map( Path::toFile )
-									.filter( f -> f.getName()
-													.contains( "33810" ) )
-									.collect( Collectors.toList() );
-
 		Tuple<Double, List<EPoint>> result;
-		ArrayList<EPoint> EPoints = null;
-		for (File file : collect)
+		ArrayList<EPoint> points = null;
+
+		if (args.length >= 1)
 		{
-			System.out.println(file);
-			EPoints = CPParser.readPoints( file );
-			Collections.sort( EPoints, (o1, o2) -> Double.compare( o1.x, o2.x ) );
-			result = ClosestPair( EPoints );
-			System.out.println(file + ": "+EPoints.size()+" "+result.val1);
-			result = null;
+			System.out.println( args[ 0 ] );
+			points = CPParser.readPoints( args[ 0 ] );
+			Collections.sort( points, (o1, o2) -> Double.compare( o1.x, o2.x ) );
+			result = ClosestPair( points );
+			System.out.println( args[ 0 ] + ": " + points.size() + " " + result.val1 );
+		}
+		else
+		{
+			final List<File> collect = Files.walk( Paths.get( "cp-data" ) )
+										.filter( Files::isRegularFile )
+										.map( Path::toFile )
+										.filter( f -> !f.getName()
+														.contains( "out" ) && !f.getName()
+																				.contains( "33810" ) )
+										.collect( Collectors.toList() );
+
+			for (File file : collect)
+			{
+				System.out.println(file);
+				points = CPParser.readPoints( file );
+				Collections.sort( points, (o1, o2) -> Double.compare( o1.x, o2.x ) );
+				result = ClosestPair( points );
+				System.out.println(file + ": "+points.size()+" "+result.val1);
+				result = null;
+			}
 		}
 	}
 

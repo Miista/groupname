@@ -1,17 +1,10 @@
-import java.io.File;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.stream.Collectors;
 
-/**
- * Created by Soren Palmund on 07-09-2015.
- */
 public class CP
 {
 	public static class Tuple<X,Y> {
@@ -44,37 +37,11 @@ public class CP
 
 	public static void main(String[] args) throws IOException
 	{
-		Tuple<Double, List<EPoint>> result;
-		ArrayList<EPoint> points = null;
-
-		if (args.length >= 1)
-		{
-			System.out.println( args[ 0 ] );
-			points = CPParser.readPoints( args[ 0 ] );
-			Collections.sort( points, (o1, o2) -> Double.compare( o1.x, o2.x ) );
-			result = ClosestPair( points );
-			System.out.println( args[ 0 ] + ": " + points.size() + " " + result.val1 );
-		}
-		else
-		{
-			final List<File> collect = Files.walk( Paths.get( "cp-data" ) )
-										.filter( Files::isRegularFile )
-										.map( Path::toFile )
-										.filter( f -> !f.getName()
-														.contains( "out" ) && !f.getName()
-																				.contains( "33810" ) )
-										.collect( Collectors.toList() );
-
-			for (File file : collect)
-			{
-				System.out.println(file);
-				points = CPParser.readPoints( file );
-				Collections.sort( points, (o1, o2) -> Double.compare( o1.x, o2.x ) );
-				result = ClosestPair( points );
-				System.out.println(file + ": "+points.size()+" "+result.val1);
-				result = null;
-			}
-		}
+		System.out.println( args[ 0 ] );
+		ArrayList<EPoint> points = CPParser.readPoints( args[ 0 ] );
+		Collections.sort( points, (o1, o2) -> Double.compare( o1.x, o2.x ) );
+		Tuple<Double, List<EPoint>> result = ClosestPair( points );
+		System.out.println( args[ 0 ] + ": " + points.size() + " " + result.val1 );
 	}
 
 	private static Tuple<Double, List<EPoint> > closestOf3( List<EPoint> list) {
@@ -87,9 +54,10 @@ public class CP
 		if( list.get(1).y > list.get(2).y) Collections.swap(list, 1, 2); // compares 2 last elements, make sure they are in order
 		if( list.get(0).y > list.get(1).y) Collections.swap(list, 0, 1); // compares 2 first again, in case order has been altered
 
-		return new Tuple<Double, List<EPoint> >(delta, list);
+		return new Tuple<>( delta, list );
 	}
 
+	@NotNull
 	public static Tuple<Double, List<EPoint> > ClosestPair( List<EPoint> input )
 	{
 		Double delta;
@@ -101,7 +69,7 @@ public class CP
 				if (input.get( 0 ).y > input.get( 1 ).y) { Collections.swap( input, 0, 1 ); }
 				delta = input.get( 0 )
 							 .distance( input.get( 1 ) );
-				return new Tuple<Double, List<EPoint>>( delta, input );
+				return new Tuple<>( delta, input );
 			case 1: // This should not occur - only if the given list only has 1 point
 				System.out.println( "Hit 1 element in queue" );
 				System.exit( -2 );
@@ -122,8 +90,7 @@ public class CP
 				/**
 				 * Stitching the 2 presorted y-lists
 				 */
-				List<EPoint> recombine = new ArrayList<EPoint>( Q.val2.size() + R.val2.size() );
-				ListIterator<EPoint> Qp = Q.val2.listIterator(), Rp = R.val2.listIterator();
+				List<EPoint> recombine = new ArrayList<>( Q.val2.size() + R.val2.size() );
 				EPoint qp, rp;
 				int qi = 0, ri = 0;
 				for (int i = 0; i < input.size(); i++)

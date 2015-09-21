@@ -1,6 +1,4 @@
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +33,7 @@ public class CP
 		}
 	}
 
-	public static void main(String[] args) throws IOException
+	public static void main(String[] args) throws FileNotFoundException
 	{
 		System.out.println( args[ 0 ] );
 		ArrayList<EPoint> points = CPParser.readPoints( args[ 0 ] );
@@ -57,7 +55,6 @@ public class CP
 		return new Tuple<>( delta, list );
 	}
 
-	@NotNull
 	public static Tuple<Double, List<EPoint> > ClosestPair( List<EPoint> input )
 	{
 		Double delta;

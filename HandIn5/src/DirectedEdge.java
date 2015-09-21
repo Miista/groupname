@@ -24,8 +24,8 @@
 public class DirectedEdge { 
     private final int from;
     private final int to;
+    private final int capacity;
     private int flow;
-    private int capacity;
 
     /**
      * Initializes a directed edge from vertex <tt>from</tt> to vertex <tt>to</tt> with
@@ -82,16 +82,6 @@ public class DirectedEdge {
     public int getCapacity()
     {
         return capacity;
-    }
-
-    public void setCapacity(int capacity)
-    {
-        this.capacity = capacity;
-    }
-
-    public void updateCapacity(double weight)
-    {
-        capacity += weight;
     }
 
     public void setFlow(int flow)

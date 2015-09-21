@@ -24,25 +24,27 @@
 public class DirectedEdge { 
     private final int v;
     private final int w;
-    private final double weight;
+    private int flow;
+    private int capacity;
 
     /**
      * Initializes a directed edge from vertex <tt>v</tt> to vertex <tt>w</tt> with
      * the given <tt>weight</tt>.
      * @param v the tail vertex
      * @param w the head vertex
-     * @param weight the weight of the directed edge
+     * @param capacity the weight of the directed edge
      * @throws IndexOutOfBoundsException if either <tt>v</tt> or <tt>w</tt>
      *    is a negative integer
      * @throws IllegalArgumentException if <tt>weight</tt> is <tt>NaN</tt>
      */
-    public DirectedEdge(int v, int w, double weight) {
+    public DirectedEdge(int v, int w, int capacity) {
         if (v < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
         if (w < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
-        if (Double.isNaN(weight)) throw new IllegalArgumentException("Weight is NaN");
+        if (Double.isNaN(capacity)) throw new IllegalArgumentException("Weight is NaN");
         this.v = v;
         this.w = w;
-        this.weight = weight;
+        this.capacity = capacity;
+        this.flow = 0;
     }
 
     /**
@@ -65,8 +67,8 @@ public class DirectedEdge {
      * Returns the weight of the directed edge.
      * @return the weight of the directed edge
      */
-    public double weight() {
-        return weight;
+    public int weight() {
+        return capacity-flow;
     }
 
     /**
@@ -74,9 +76,40 @@ public class DirectedEdge {
      * @return a string representation of the directed edge
      */
     public String toString() {
-        return v + "->" + w + " " + String.format("%5.2f", weight);
+        return v + "->" + w + " " + String.format("[ %d / %d ]", flow, capacity);
     }
 
+    public int getCapacity()
+    {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity)
+    {
+        this.capacity = capacity;
+    }
+
+    public void updateCapacity(double weight)
+    {
+        capacity += weight;
+    }
+
+    public void setFlow(int flow)
+    {
+        this.flow += flow;
+    }
+
+    public int getFlow()
+    {
+        return flow;
+    }
+
+    public DirectedEdge getFlippedVersion()
+    {
+        final DirectedEdge directedEdge = new DirectedEdge( to(), from(), capacity );
+        directedEdge.flow = 0;
+        return directedEdge;
+    }
 }
 
 /******************************************************************************

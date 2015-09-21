@@ -35,24 +35,24 @@ public class ResidualGraph extends EdgeWeightedDigraph
         return false;
     }
 
-    public int[][] buildPaths(int start, int end)
-    {
-        final Iterable<DirectedEdge> edges = this.adj( start );
-
-        int[][] paths = new int[10][10];
-        int index = 0;
-        for (DirectedEdge edge : edges)
-        {
-            if (edge.to() == end)
-            {
-                final int[][] ints = new int[ 0 ][ 0 ];
-                ints[0][0] = start;
-                return ints;
-            }
-            paths[index] = new int[10];
-            buildPaths( edge.to(), end );
-        }
-
-        return new int[0][0];
-    }
+//    public ArrayList<Integer[]> buildPaths(int start, int end)
+//    {
+//        final Iterable<DirectedEdge> edges = this.adj( start );
+//
+//        final ArrayList<Integer[]> paths = new ArrayList<>();
+//
+//        int index = 0;
+//        for (DirectedEdge edge : edges)
+//        {
+//            if (edge.to() == end)
+//            {
+//                paths.add( new Integer[] { start, end } );
+//                return paths;
+//            }
+//
+//            final ArrayList<Integer[]> childPaths = buildPaths( edge.to(), end );
+//        }
+//
+//        return new int[0][0];
+//    }
 }

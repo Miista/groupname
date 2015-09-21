@@ -185,13 +185,12 @@ public class EdgeWeightedDigraph {
         for (int v = 0; v < V; v++) {
             s.append(v + ": ");
             for (DirectedEdge e : adj[v]) {
-                s.append(e + "  ");
+                s.append( e + "  " );
             }
             s.append(NEWLINE);
         }
         return s.toString();
     }
-
 }
 
 /******************************************************************************

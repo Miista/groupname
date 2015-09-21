@@ -22,18 +22,18 @@
  */
 
 public class DirectedEdge { 
-    private final int v;
-    private final int w;
+    private final int from;
+    private final int to;
     private int flow;
     private int capacity;
 
     /**
-     * Initializes a directed edge from vertex <tt>v</tt> to vertex <tt>w</tt> with
+     * Initializes a directed edge from vertex <tt>from</tt> to vertex <tt>to</tt> with
      * the given <tt>weight</tt>.
      * @param v the tail vertex
      * @param w the head vertex
      * @param capacity the weight of the directed edge
-     * @throws IndexOutOfBoundsException if either <tt>v</tt> or <tt>w</tt>
+     * @throws IndexOutOfBoundsException if either <tt>from</tt> or <tt>to</tt>
      *    is a negative integer
      * @throws IllegalArgumentException if <tt>weight</tt> is <tt>NaN</tt>
      */
@@ -41,8 +41,8 @@ public class DirectedEdge {
         if (v < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
         if (w < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
         if (Double.isNaN(capacity)) throw new IllegalArgumentException("Weight is NaN");
-        this.v = v;
-        this.w = w;
+        this.from = v;
+        this.to = w;
         this.capacity = capacity;
         this.flow = 0;
     }
@@ -52,7 +52,7 @@ public class DirectedEdge {
      * @return the tail vertex of the directed edge
      */
     public int from() {
-        return v;
+        return from;
     }
 
     /**
@@ -60,7 +60,7 @@ public class DirectedEdge {
      * @return the head vertex of the directed edge
      */
     public int to() {
-        return w;
+        return to;
     }
 
     /**
@@ -76,7 +76,7 @@ public class DirectedEdge {
      * @return a string representation of the directed edge
      */
     public String toString() {
-        return v + "->" + w + " " + String.format("[ %d / %d ]", flow, capacity);
+        return from + "->" + to + " " + String.format("[ %d / %d ]", flow, capacity);
     }
 
     public int getCapacity()

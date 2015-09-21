@@ -1,5 +1,6 @@
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.BellmanFordShortestPath;
+import org.jgrapht.alg.KShortestPaths;
 import org.jgrapht.graph.*;
 
 import java.io.File;
@@ -66,12 +67,11 @@ public class FlowReader {
 			final List<DirectedEdge> pathEdgeList = pathFinder.getPathEdgeList( sink );
 
 			// Some edges can be infinite
-			final Optional<DirectedEdge> min1 = pathEdgeList.stream()
-															.filter( e -> e.getCapacity() > 0 )
-															.min( (o1, o2) -> Double.compare( o1.weight(), o2.weight() ) );
-			final int min = min1
-                                                 .get()
-												 .weight();
+			final int min = pathEdgeList.stream()
+										.filter( e -> e.getCapacity() > 0 )
+										.min( (o1, o2) -> Double.compare( o1.weight(), o2.weight() ) )
+										.get()
+									 	.weight();
 			totalFlow += min;
 
 			for (DirectedEdge edge : pathEdgeList)

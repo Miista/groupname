@@ -24,8 +24,8 @@ public class FlowReader {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		EdgeWeightedDigraph g = parseFile( new File("flow_data/rail.txt") );
-		System.out.println("Read V:" + g.V() + " E: " + g.E() );
+		EdgeWeightedDigraph g = parseFile( new File("flow-data/rail.txt") );
+		System.out.println("Read getVerticeCount:" + g.getVerticeCount() + " getEdgeCount: " + g.getEdgeCount() );
 	}
 
 }

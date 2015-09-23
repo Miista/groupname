@@ -36,6 +36,22 @@ public class GSC
         }
 
         if (current.x > 0 || current.y > 0){
+            if(current.x == 0){
+                while (current.y > 0){
+                    final char c1 = current.y == last.y || current.y == 0 ? '-' : y[ current.y - 1 ];
+                    s1.append( '-' );
+                    s2.append( c1 );
+                    current.y --;
+                }
+            } else {
+                while (current.x > 0){
+                    final char c = current.x == last.x || current.x == 0 ? '-' : x[ current.x - 1 ];
+                    s1.append( c );
+                    s2.append( '-' );
+                    current.x --;
+                }
+
+            }
             final char c = current.x == last.x || current.x == 0 ? '-' : x[ current.x - 1 ];
             final char c1 = current.y == last.y || current.y == 0 ? '-' : y[ current.y - 1 ];
             s1.append( c );

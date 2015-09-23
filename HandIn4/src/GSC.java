@@ -9,6 +9,7 @@ import java.util.*;
 public class GSC
 {
     private static final int delta = -4;
+    public static final int UNSET_VALUE = Integer.MIN_VALUE;
 
     private static Point[][] path;
     private static Map<String, Integer> alpha = Matcher.costs;
@@ -18,10 +19,7 @@ public class GSC
     public static void main(String[] args) throws FileNotFoundException {
         x = args[0].toCharArray();
         y = args[1].toCharArray();
-        final long start = System.currentTimeMillis();
         final int score = calculateMatchScore();
-        final long stop = System.currentTimeMillis();
-        System.out.println( "O: "+(stop-start) );
 
         StringBuilder s1 = new StringBuilder(  );
         StringBuilder s2 = new StringBuilder(  );
@@ -29,62 +27,15 @@ public class GSC
         Point last = new Point( -1, -1 );
         while (current.x != 0 && current.y != 0)
         {
-            if (current.x == last.x)
-            {
-                s1.append( '-' );
-            }
-            else
-            {
-                s1.append( x[current.x-1] );
-            }
-
-            if (current.y == last.y)
-            {
-                s2.append( '-' );
-            }
-            else
-            {
-                s2.append( y[current.y-1] );
-            }
+            final char c = current.x == last.x ? '-' : x[ current.x - 1 ];
+            final char c1 = current.y == last.y ? '-' : y[ current.y - 1 ];
+            s1.append( c );
+            s2.append( c1 );
             last = current;
             current = path[current.x][current.y];
         }
 
-        System.out.println(s1.reverse().toString());
-        System.out.println(s2.reverse().toString());
-
-        System.out.println( score );
-//        System.out.println( value.item1 );
-
-//        final char[] as = a.toCharArray();
-//        final char[] bs = b.toCharArray();
-//        final Point[] _path =
-//        Point last = new Point( 0, 0 );
-//        for (Point point : _path)
-//        {
-//            if (Math.abs( point.y - last.y ) == 1)
-//            {
-//                System.out.print( as[ point.y-1 ] );
-//            } else
-//            {
-//                System.out.print( "-" );
-//            }
-//            last = point;
-//        }
-//        System.out.println();
-//        last = new Point( 0, 0 );
-//        for (Point point : _path)
-//        {
-//            if (Math.abs( point.x - last.x ) == 1)
-//            {
-//                System.out.print( bs[ point.x-1 ] );
-//            } else
-//            {
-//                System.out.print( "-" );
-//            }
-//            last = point;
-//        }
-//        System.out.println();
+        System.out.printf( "Score: %d\nString1: %s\nString2: %s\n", score, s1.reverse(), s2.reverse() );
     }
 
     static int calculateMatchScore()
@@ -95,7 +46,7 @@ public class GSC
         // Initialize all cells
         for (int[] ints : M)
         {
-            Arrays.fill(ints, -999);
+            Arrays.fill(ints, UNSET_VALUE );
         }
 
         // Initialize first row
@@ -126,7 +77,7 @@ public class GSC
 
     private static int optimal(int i, int j)
     {
-        if ( M[i][j] != -999 )
+        if ( M[i][j] != UNSET_VALUE)
         {
             return M[i][j];
         }

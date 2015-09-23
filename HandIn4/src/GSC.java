@@ -35,6 +35,12 @@ public class GSC
             current = path[current.x][current.y];
         }
 
+        if (current.x > 0 || current.y > 0){
+            final char c = current.x == last.x || current.x == 0 ? '-' : x[ current.x - 1 ];
+            final char c1 = current.y == last.y || current.y == 0 ? '-' : y[ current.y - 1 ];
+            s1.append( c );
+            s2.append( c1 );
+        }
         System.out.printf( "Score: %d\nString1: %s\nString2: %s\n", score, s1.reverse(), s2.reverse() );
     }
 

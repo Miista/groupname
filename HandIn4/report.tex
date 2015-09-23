@@ -9,7 +9,7 @@
 
 
 \title{Gorilla Report}
-\author{Evaristo Columby, Martino Secchi, Søren Palmund and Ivan Naumovski}
+\author{Evaristo Colomby, Martino Secchi, Søren Palmund and Ivan Naumovski}
 
 \begin{document}
   \maketitle
@@ -27,19 +27,20 @@
   PENFRLLGNM IVIVLGHHLG KEFTPCAQAA FQKVVAGVAS ALAHKYH
   \end{verbatim}
 
-  The closest species to \emph{Rattus rattus} is $[\ldots]$, with the following optimal alignment:
+
+  The closest species to \emph{Rattus rattus} is  \emph{Human}, with the following optimal alignment:
 
 \medskip
   \begin{fullwidth}\small
   \begin{verbatim}
-  MVHLTDAEKAAVNALWGKVNPDDV-YGGEAL----VVYPWTQRYFDSFGDLS
-  MVHLTDAEKAAVNALWGKVNPDDVX-GGEALGRLLVVYPWTIRYFDSFGDLS
+  MVHLTDAEKAAVNALWGKVNPDDVGGEALGRLLVVYPWTQRYFDSFGDLSSA
+  MVHLTPEEKSAVTALWGKVNVDEVGGEALGRLLVVYPWTQRFFESFGDLSTP
 
-  SASAIMGNPKVKAHGKKVINAFND---KHLDNLKGTFAHLSELHTDKLHVDPENFRLLGN
-  SASAIMGNPKVKAHGKKVINAFNDDVHKHLDNLKGTFAHLSELHSDKLHVDPENFRLLGN
+  SAIMGNPKVKAHGKKVINAFNDGLKHLDNLKGTFAHLSELHCDKLHVDPENFRLLGNMIV
+  DAVMGNPKVKAHGKKVLGAFSDGLAHLDNLKGTFATLSELHCDKLHVDPENFRLLGNVLV
 
-  MIVIVLGHHLGKEFTPC----------AQAAFQKVVAGVASALAHKYH
-  MIVIVLGHHLGKEFTPCVOLKSWAGENAQAAFQKVVAGVASALAHKYH
+  IVLGHHLGKEFTPCAQAAFQKVVAGVASALAHKYH
+  CVLAHHFGKEFTPPVQAAYQKVVAGVANALAHKYH
   \end{verbatim}
 \end{fullwidth}
 
@@ -50,10 +51,10 @@ We did a function which compares two strings, we denote these as $X$ and  $Y$.
 Initially we do a two-dimensional array, called $M$, which represents the value of a given coordinate within the matching.
 
 \begin{equation}
-    opt(X_i, Y_j) = 
+    opt(X_i, Y_j) =
     \begin{cases}
     	i\cdot\delta       			& \quad \text{if } j = 0\\
-        max 	\begin{cases}	 
+        max 	\begin{cases}
         \alpha_{X_i Y_i} + opt(i-1, j-1)\\
         \delta + opt(i-1, j)\\
         \delta + opt(i, j-1)\\

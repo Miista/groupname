@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * Created by Søren Palmund on 21-09-2015.
+ * Created by Soren Palmund on 21-09-2015.
  */
 public class ResidualGraph extends EdgeWeightedDigraph
 {

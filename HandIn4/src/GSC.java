@@ -12,7 +12,7 @@ public class GSC
     public static final int UNSET_VALUE = Integer.MIN_VALUE;
 
     private static Point[][] path;
-    private static Map<String, Integer> alpha = Matcher.costs;
+    private static Map<String, Integer> alpha = InputParser.readCosts("gorilla_data/BLOSUM62.txt");
     private static int[][] M;
     private static char[] x, y;
 

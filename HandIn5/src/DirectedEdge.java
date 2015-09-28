@@ -25,6 +25,7 @@ public class DirectedEdge {
     private final int from;
     private final int to;
     private final int capacity;
+    private final FlowReader.Vertex vn, wn;
     private int flow;
 
     /**
@@ -38,8 +39,15 @@ public class DirectedEdge {
      * @throws IllegalArgumentException if <tt>weight</tt> is <tt>NaN</tt>
      */
     public DirectedEdge(int v, int w, int capacity) {
+        this(new FlowReader.Vertex( "" ), v, new FlowReader.Vertex( "" ), w, capacity);
+    }
+
+    public DirectedEdge(FlowReader.Vertex vn, int v, FlowReader.Vertex wn, int w, int capacity) {
         if (v < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
         if (w < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
+
+        this.vn = vn;
+        this.wn = wn;
         if (Double.isNaN(capacity)) throw new IllegalArgumentException("Weight is NaN");
         this.from = v;
         this.to = w;
@@ -68,7 +76,7 @@ public class DirectedEdge {
      * @return the weight of the directed edge
      */
     public int weight() {
-        return capacity-flow;
+        return capacity == -1 ? -1 : capacity-flow;
     }
 
     /**
@@ -76,7 +84,7 @@ public class DirectedEdge {
      * @return a string representation of the directed edge
      */
     public String toString() {
-        return from + "->" + to + " " + String.format("[ %d / %d ]", flow, capacity);
+        return String.format( "%s (%s) -> %s (%s) [ %d / %d ]", from, vn.getName(), to, wn.getName(), flow, capacity);
     }
 
     public int getCapacity()
@@ -96,9 +104,19 @@ public class DirectedEdge {
 
     public DirectedEdge getFlippedVersion()
     {
-        final DirectedEdge directedEdge = new DirectedEdge( to(), from(), capacity );
+        final DirectedEdge directedEdge = new DirectedEdge( vn, to(), wn, from(), capacity );
         directedEdge.flow = 0;
         return directedEdge;
+    }
+
+    public FlowReader.Vertex getFromVertex()
+    {
+        return vn;
+    }
+
+    public FlowReader.Vertex getToVertex()
+    {
+        return wn;
     }
 }
 

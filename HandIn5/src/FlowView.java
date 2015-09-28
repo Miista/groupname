@@ -12,9 +12,6 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
 import org.jgraph.JGraph;
-import org.jgraph.graph.DefaultGraphCell;
-import org.jgraph.graph.GraphConstants;
-import org.jgraph.layout.*;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.ext.JGraphModelAdapter;
 import org.jgrapht.graph.DirectedMultigraph;
@@ -68,8 +65,8 @@ public class FlowView extends JFrame {
 	             roots.add(jgma.getVertexCell(vertex)); 
 	         } 
 	     } 
-		JGraphLayoutAlgorithm layout = new SpringEmbeddedLayoutAlgorithm();
-		layout.applyLayout(jgraph, roots.toArray(), layout); 
+//		JGraphLayoutAlgorithm layout = new SpringEmbeddedLayoutAlgorithm();
+//		layout.applyLayout(jgraph, roots.toArray(), layout);
 
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		FlowReader.NF( gg , v0, v2 );

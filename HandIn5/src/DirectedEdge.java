@@ -42,6 +42,10 @@ public class DirectedEdge {
         this(new FlowReader.Vertex( "" ), v, new FlowReader.Vertex( "" ), w, capacity);
     }
 
+    public DirectedEdge(FlowReader.Vertex from, FlowReader.Vertex to, int capacity) {
+        this(from, 0, to, 0, capacity);
+    }
+
     public DirectedEdge(FlowReader.Vertex vn, int v, FlowReader.Vertex wn, int w, int capacity) {
         if (v < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
         if (w < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");

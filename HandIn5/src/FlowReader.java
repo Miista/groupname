@@ -47,7 +47,7 @@ public class FlowReader {
 		int totalFlow = 0;
 		int maxEdges = 1;
 
-		DirectedGraph<Vertex, DirectedEdge> residualGraph = new DefaultDirectedGraph( DirectedEdge.class );
+		DirectedGraph<Vertex, DirectedEdge> residualGraph = new DirectedMultigraph<Vertex, DirectedEdge>( DirectedEdge.class );
 		for (Vertex v : g.vertexSet())
 		{
 			residualGraph.addVertex( v );
@@ -101,30 +101,35 @@ public class FlowReader {
 	}
 
 	public static void main(String[] args) throws Exception {
-		DirectedGraph<Vertex, DirectedEdge> g = parseFile( new File( "flow-data/rail.txt" ) );
-//		final DirectedGraph<Integer, DirectedEdge> g = new DirectedMultigraph<>( DirectedEdge.class );
-//		g.addVertex( 0 );
-//		g.addVertex( 1 );
-//		g.addVertex( 2 );
-//		g.addVertex( 3 );
-////		g.addVertex( 4 );
-////		g.addVertex( 5 );
-//		g.addEdge( 0, 1, new DirectedEdge( 0,1,-1 ) );
-//		g.addEdge( 0, 3, new DirectedEdge( 0,3,-1 ) );
-//		g.addEdge( 1, 2, new DirectedEdge( 1,2,10 ) );
-//		g.addEdge( 1, 3, new DirectedEdge( 1,3,30 ) );
-//		g.addEdge( 3, 2, new DirectedEdge( 3,2,20 ) );
-////		g.addEdge( 0, 1, new DirectedEdge( 0,1,10 ) );
-////		g.addEdge( 0, 2, new DirectedEdge( 0,2,10 ) );
-////		g.addEdge( 1, 2, new DirectedEdge( 1,2,2 ) );
-////		g.addEdge( 1, 3, new DirectedEdge( 1,3,4 ) );
-////		g.addEdge( 1, 4, new DirectedEdge( 1,4,8 ) );
-////		g.addEdge( 2, 4, new DirectedEdge( 2,4,9 ) );
-////		g.addEdge( 3, 5, new DirectedEdge( 3,5,10 ) );
-////		g.addEdge( 4, 3, new DirectedEdge( 4,3,6 ) );
-////		g.addEdge( 4, 5, new DirectedEdge( 4,5,10 ) );
+//		DirectedGraph<Vertex, DirectedEdge> g = parseFile( new File( "flow-data/rail.txt" ) );
+		final DirectedGraph<Vertex, DirectedEdge> g = new DirectedMultigraph<>( DirectedEdge.class );
+		final Vertex v0 = new Vertex( "0" );
+		final Vertex v1 = new Vertex( "1" );
+		final Vertex v2 = new Vertex( "2" );
+		final Vertex v3 = new Vertex( "3" );
+		g.addVertex( v0 );
+		g.addVertex( v1 );
+		g.addVertex( v2 );
+		g.addVertex( v3 );
+//		g.addVertex( 4 );
+//		g.addVertex( 5 );
+		g.addEdge( v0, v1, new DirectedEdge( v0, 0, v1, 1,20 ) );
+		g.addEdge( v0, v3, new DirectedEdge( v0, 0, v3, 3,10 ) );
+		g.addEdge( v1, v2, new DirectedEdge( v1, 1, v2, 2,10 ) );
+		g.addEdge( v1, v3, new DirectedEdge( v1, 1, v3,3,30 ) );
+		g.addEdge( v3, v2, new DirectedEdge( v3,3,v2,2,20 ) );
+		g.addEdge( v1, v0, new DirectedEdge( v1, 1, v0, 0, -1 ) );
+//		g.addEdge( 0, 1, new DirectedEdge( 0,1,10 ) );
+//		g.addEdge( 0, 2, new DirectedEdge( 0,2,10 ) );
+//		g.addEdge( 1, 2, new DirectedEdge( 1,2,2 ) );
+//		g.addEdge( 1, 3, new DirectedEdge( 1,3,4 ) );
+//		g.addEdge( 1, 4, new DirectedEdge( 1,4,8 ) );
+//		g.addEdge( 2, 4, new DirectedEdge( 2,4,9 ) );
+//		g.addEdge( 3, 5, new DirectedEdge( 3,5,10 ) );
+//		g.addEdge( 4, 3, new DirectedEdge( 4,3,6 ) );
+//		g.addEdge( 4, 5, new DirectedEdge( 4,5,10 ) );
 
-		System.out.println( NF( g, vertices.get( 0 ), vertices.get( 54 ) ) );
+		System.out.println( NF( g, v0, v2 ) );
 	}
 
 	static class Vertex

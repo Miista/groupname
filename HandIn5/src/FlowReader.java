@@ -29,6 +29,7 @@ public class FlowReader {
 				verticeCount--;
 				g.addVertex( i );
 				i++;
+				s.next(); //added this for correct reading
 			}
 			edges = Integer.parseInt( s.next() );
 			while( s.hasNext() && edges > 0) {

@@ -1,4 +1,5 @@
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.Graph;
 import org.jgrapht.alg.BellmanFordShortestPath;
 import org.jgrapht.graph.*;
 
@@ -10,15 +11,15 @@ import java.util.Scanner;
 public class FlowReader {
 	public final ArrayList<Integer> vertices = new ArrayList<>();
 
-	private final DirectedGraph<Integer, DirectedEdge> graph;
+	private final Graph<Integer, DirectedEdge> graph;
 
 	public FlowReader(File f) throws Exception
 	{
 		this.graph = parseFile( f );
 	}
 
-	public DirectedGraph<Integer, DirectedEdge> parseFile(File f) throws Exception {
-		DirectedGraph<Integer, DirectedEdge> g = new DirectedMultigraph<>( DirectedEdge.class );
+	public Graph<Integer, DirectedEdge> parseFile(File f) throws Exception {
+		Graph<Integer, DirectedEdge> g = new SimpleWeightedGraph<>( DirectedEdge.class );
 
 		int verticeCount, edges;
 		try( Scanner s = new Scanner(f, "UTF-8") ) {
@@ -59,6 +60,7 @@ public class FlowReader {
 		for (DirectedEdge<Integer> edge : graph.edgeSet())
 		{
 			residualGraph.addEdge( edge.from, edge.to, edge );
+			residualGraph.addEdge( edge.to, edge.from, new DirectedEdge<>( edge.to, edge.from, 0 ) );
 		}
 
 		main:do

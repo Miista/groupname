@@ -1,12 +1,7 @@
 import java.awt.BorderLayout;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -38,12 +33,12 @@ public class FlowView extends JFrame {
 		gg.addVertex( v1 );
 		gg.addVertex( v2 );
 		gg.addVertex( v3 );
-		gg.addEdge( v0, v1, new DirectedEdge( v0, 0, v1, 1,20 ) );
-		gg.addEdge( v0, v3, new DirectedEdge( v0, 0, v3, 3,10 ) );
-		gg.addEdge( v1, v2, new DirectedEdge( v1, 1, v2, 2,10 ) );
-		gg.addEdge( v1, v3, new DirectedEdge( v1, 1, v3,3,30 ) );
-		gg.addEdge( v3, v2, new DirectedEdge( v3,3,v2,2,20 ) );
-		gg.addEdge( v1, v0, new DirectedEdge( v1, 1, v0, 0, -1 ) );
+		gg.addEdge( v0, v1, new DirectedEdge( v0, v1, 20 ) );
+		gg.addEdge( v0, v3, new DirectedEdge( v0, v3, 10 ) );
+		gg.addEdge( v1, v2, new DirectedEdge( v1, v2, 10 ) );
+		gg.addEdge( v1, v3, new DirectedEdge( v1, v3, 30 ) );
+		gg.addEdge( v3, v2, new DirectedEdge( v3, v2, 20 ) );
+		gg.addEdge( v1, v0, new DirectedEdge( v1, v0, -1 ) );
 
 		// create a visualization using JGraph, via the adapter
 
@@ -69,7 +64,7 @@ public class FlowView extends JFrame {
 //		layout.applyLayout(jgraph, roots.toArray(), layout);
 
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		FlowReader.NF( gg , v0, v2 );
+//		FlowReader.maxFlow( gg, v0, v2 );
 
 	}
 

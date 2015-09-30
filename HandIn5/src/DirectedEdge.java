@@ -22,8 +22,6 @@
  */
 
 public class DirectedEdge { 
-    private final int from;
-    private final int to;
     private final int capacity;
     private final FlowReader.Vertex vn, wn;
     private int flow;
@@ -38,42 +36,41 @@ public class DirectedEdge {
      *    is a negative integer
      * @throws IllegalArgumentException if <tt>weight</tt> is <tt>NaN</tt>
      */
-    public DirectedEdge(int v, int w, int capacity) {
-        this(new FlowReader.Vertex( "" ), v, new FlowReader.Vertex( "" ), w, capacity);
-    }
-
     public DirectedEdge(FlowReader.Vertex from, FlowReader.Vertex to, int capacity) {
-        this(from, 0, to, 0, capacity);
-    }
-
-    public DirectedEdge(FlowReader.Vertex vn, int v, FlowReader.Vertex wn, int w, int capacity) {
-        if (v < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
-        if (w < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
-
-        this.vn = vn;
-        this.wn = wn;
-        if (Double.isNaN(capacity)) throw new IllegalArgumentException("Weight is NaN");
-        this.from = v;
-        this.to = w;
+        this.vn = from;
+        this.wn = to;
         this.capacity = capacity;
         this.flow = 0;
     }
+
+//    public DirectedEdge(FlowReader.Vertex vn, int v, FlowReader.Vertex wn, int w, int capacity) {
+//        if (v < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
+//        if (w < 0) throw new IndexOutOfBoundsException("Vertex names must be nonnegative integers");
+//
+//        this.vn = vn;
+//        this.wn = wn;
+//        if (Double.isNaN(capacity)) throw new IllegalArgumentException("Weight is NaN");
+//        this.from = v;
+//        this.to = w;
+//        this.capacity = capacity;
+//        this.flow = 0;
+//    }
 
     /**
      * Returns the tail vertex of the directed edge.
      * @return the tail vertex of the directed edge
      */
-    public int from() {
-        return from;
-    }
+//    public int from() {
+//        return from;
+//    }
 
     /**
      * Returns the head vertex of the directed edge.
      * @return the head vertex of the directed edge
      */
-    public int to() {
-        return to;
-    }
+//    public int to() {
+//        return to;
+//    }
 
     /**
      * Returns the weight of the directed edge.
@@ -88,7 +85,8 @@ public class DirectedEdge {
      * @return a string representation of the directed edge
      */
     public String toString() {
-        return String.format( "%s (%s) -> %s (%s) [ %d / %d ]", from, vn.getName(), to, wn.getName(), flow, capacity);
+        return String.format( "%s -> %s [ %d / %d ]", vn.getName(), wn.getName(), flow, capacity);
+//        return String.format( "%s (%s) -> %s (%s) [ %d / %d ]", from, vn.getName(), to, wn.getName(), flow, capacity);
     }
 
     public int getCapacity()
@@ -106,12 +104,12 @@ public class DirectedEdge {
         return flow;
     }
 
-    public DirectedEdge getFlippedVersion()
-    {
-        final DirectedEdge directedEdge = new DirectedEdge( vn, to(), wn, from(), capacity );
-        directedEdge.flow = 0;
-        return directedEdge;
-    }
+//    public DirectedEdge getFlippedVersion()
+//    {
+//        final DirectedEdge directedEdge = new DirectedEdge( vn, to(), wn, from(), capacity );
+//        directedEdge.flow = 0;
+//        return directedEdge;
+//    }
 
     public FlowReader.Vertex getFromVertex()
     {

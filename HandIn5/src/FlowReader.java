@@ -116,26 +116,28 @@ public class FlowReader {
 		setA.add( source );
 		graph.outgoingEdgesOf( source )
 			 .stream()
-			 .filter( e -> e.weight() >= 0 && !setA.contains( e.to ) )
+			 .filter( e -> (e.weight() >= 0 || e.isInfinite) && !setA.contains( e.to ) )
 			 .map( e -> (int) e.to ) // MUST do type cast!
 			 .forEach( i -> findMinimumCut( graph, i ) );
 	}
 
 	public static void main(String[] args) throws Exception {
-		FlowReader f1 = new FlowReader( new File( "flow_data/easy.txt" ) );
-		System.out.println( f1.maxFlow( 0, 5 ) );
+		FlowReader f1 = new FlowReader( new File( "flow_data/rail.txt" ) );
+		System.out.println( f1.maxFlow( 0, 54 ) );
 	}
 
     private static class DirectedEdge<V> {
         public final int capacity;
         public final V from, to;
         public int flow;
+		public final boolean isInfinite;
 
         public DirectedEdge(V from, V to, int capacity) {
             this.from = from;
             this.to = to;
             this.capacity = capacity;
             this.flow = 0;
+			this.isInfinite = capacity == -1;
         }
 
         public int weight() {

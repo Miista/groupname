@@ -1,25 +1,24 @@
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.Graph;
 import org.jgrapht.alg.BellmanFordShortestPath;
 import org.jgrapht.graph.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class FlowReader {
 	public final ArrayList<Integer> vertices = new ArrayList<>();
 
-	private final Graph<Integer, DirectedEdge> graph;
+	private final Set<Integer> setA = new HashSet<>(  );
+	private final SimpleWeightedGraph<Integer, DirectedEdge> graph;
 
 	public FlowReader(File f) throws Exception
 	{
 		this.graph = parseFile( f );
 	}
 
-	public Graph<Integer, DirectedEdge> parseFile(File f) throws Exception {
-		Graph<Integer, DirectedEdge> g = new SimpleWeightedGraph<>( DirectedEdge.class );
+	public SimpleWeightedGraph<Integer, DirectedEdge> parseFile(File f) throws Exception {
+		SimpleWeightedGraph<Integer, DirectedEdge> g = new SimpleWeightedGraph<>( DirectedEdge.class );
 
 		int verticeCount, edges;
 		try( Scanner s = new Scanner(f, "UTF-8") ) {
@@ -60,7 +59,7 @@ public class FlowReader {
 		for (DirectedEdge<Integer> edge : graph.edgeSet())
 		{
 			residualGraph.addEdge( edge.from, edge.to, edge );
-			residualGraph.addEdge( edge.to, edge.from, new DirectedEdge<>( edge.to, edge.from, 0 ) );
+			residualGraph.addEdge( edge.to, edge.from, new DirectedEdge<>( edge.to, edge.from, edge.capacity ) );
 		}
 
 		main:do
@@ -98,12 +97,33 @@ public class FlowReader {
 			}
 		} while (true);
 
+		findMinimumCut( residualGraph, source );
+		setA.forEach( i -> graph.edgesOf( i )
+								.stream()
+								.filter( e -> !(setA.contains( e.from ) && setA.contains( e.to )) ) // Where both end are NOT in A*
+								.forEach( e -> System.out.printf( "%d %d %d\n", e.from, e.to, e.capacity ) ) );
+
 		return totalFlow;
 	}
 
+	private void findMinimumCut(DirectedGraph<Integer, DirectedEdge> graph, Integer source)
+	{
+		if (setA.contains( source ))
+		{
+			return;
+		}
+
+		setA.add( source );
+		graph.outgoingEdgesOf( source )
+			 .stream()
+			 .filter( e -> e.weight() >= 0 && !setA.contains( e.to ) )
+			 .map( e -> (int) e.to ) // MUST do type cast!
+			 .forEach( i -> findMinimumCut( graph, i ) );
+	}
+
 	public static void main(String[] args) throws Exception {
-		FlowReader f1 = new FlowReader( new File( "flow_data/rail.txt" ) );
-		System.out.println( f1.maxFlow( 0, 54 ) );
+		FlowReader f1 = new FlowReader( new File( "flow_data/easy.txt" ) );
+		System.out.println( f1.maxFlow( 0, 5 ) );
 	}
 
     private static class DirectedEdge<V> {

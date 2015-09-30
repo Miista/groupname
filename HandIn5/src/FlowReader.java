@@ -10,15 +10,15 @@ import java.util.Scanner;
 public class FlowReader {
 	public final ArrayList<Integer> vertices = new ArrayList<>();
 
-	private final DirectedGraph<Integer, DirectedEdge<Integer>> graph;
+	private final DirectedGraph<Integer, DirectedEdge> graph;
 
 	public FlowReader(File f) throws Exception
 	{
 		this.graph = parseFile( f );
 	}
 
-	public DirectedGraph<Integer, DirectedEdge<Integer>> parseFile(File f) throws Exception {
-		DirectedGraph<Integer, DirectedEdge<Integer>> g = new DirectedMultigraph<>( DirectedEdge.class );
+	public DirectedGraph<Integer, DirectedEdge> parseFile(File f) throws Exception {
+		DirectedGraph<Integer, DirectedEdge> g = new DirectedMultigraph<>( DirectedEdge.class );
 
 		int verticeCount, edges;
 		try( Scanner s = new Scanner(f, "UTF-8") ) {
@@ -29,15 +29,15 @@ public class FlowReader {
 				verticeCount--;
 				g.addVertex( i );
 				i++;
-				s.next(); //added this for correct reading
+				s.next();
 			}
 			edges = Integer.parseInt( s.next() );
 			while( s.hasNext() && edges > 0) {
 				int from = s.nextInt();
 				int to = s.nextInt();
 				int value = s.nextInt();
-				final Integer fromVertex = vertices.get( from );
-				final Integer toVertex = vertices.get( to );
+				final Integer fromVertex = vertices.get(from);
+				final Integer toVertex = vertices.get(to);
 				g.addEdge( fromVertex, toVertex, new DirectedEdge<>( fromVertex, toVertex, value ) );
 				g.addEdge( toVertex, fromVertex, new DirectedEdge<>( toVertex, fromVertex, value ) );
 				edges--;
@@ -83,7 +83,7 @@ public class FlowReader {
 										.get()
 									 	.weight();
 			totalFlow += min;
-			for (@SuppressWarnings("unchecked") DirectedEdge<Integer> forwardEdge : pathEdgeList)
+			for (DirectedEdge<Integer> forwardEdge : pathEdgeList)
             {
 				final DirectedEdge backwardsEdge = residualGraph.getEdge( forwardEdge.to, forwardEdge.from );
 				forwardEdge.flow += min;
@@ -100,7 +100,7 @@ public class FlowReader {
 	}
 
 	public static void main(String[] args) throws Exception {
-		FlowReader f1 = new FlowReader( new File( "flow-data/rail.txt" ) );
+		FlowReader f1 = new FlowReader( new File( "flow_data/rail.txt" ) );
 		System.out.println( f1.maxFlow( 0, 54 ) );
 	}
 

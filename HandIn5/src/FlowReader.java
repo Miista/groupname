@@ -12,6 +12,9 @@ public class FlowReader {
 	private final Set<Integer> setA = new HashSet<>(  );
 	private final SimpleWeightedGraph<Integer, DirectedEdge> graph;
 
+	private int totalFlow = 0;
+	private int maxEdges = 1;
+
 	public FlowReader(File f) throws Exception
 	{
 		this.graph = parseFile( f );
@@ -48,10 +51,11 @@ public class FlowReader {
 
 	public int maxFlow(int sourceIndex, int sinkIndex)
 	{
+		final int numberOfVerticesInGraph = graph.vertexSet()
+											  .size();
+
 		Integer source = vertices.get( sourceIndex );
 		Integer sink = vertices.get( sinkIndex );
-		int totalFlow = 0;
-		int maxEdges = 1;
 
 		DirectedGraph<Integer, DirectedEdge> residualGraph = new DirectedMultigraph<>( DirectedEdge.class );
 		graph.vertexSet()
@@ -65,21 +69,19 @@ public class FlowReader {
 		main:do
 		{
 			BellmanFordShortestPath<Integer, DirectedEdge> pathFinder = new BellmanFordShortestPath<>( residualGraph, source, maxEdges );
-			int n = 0;
 			while (pathFinder.getPathEdgeList( sink ) == null)
             {
-				if (n > 1000) {
-					break main;
+				if (maxEdges > numberOfVerticesInGraph) {
+					break main; // We can't visit the same node twice
 				}
                 pathFinder = new BellmanFordShortestPath<>( residualGraph, source, ++maxEdges );
-				n++;
-            }
+			}
 
 			final List<DirectedEdge> pathEdgeList = pathFinder.getPathEdgeList( sink );
 
 			// Some edges can be infinite
 			final int min = pathEdgeList.stream()
-										.filter( e -> e.capacity > 0 )
+										.filter( e -> !e.isInfinite )
 										.min( (o1, o2) -> Double.compare( o1.weight(), o2.weight() ) )
 										.get()
 									 	.weight();

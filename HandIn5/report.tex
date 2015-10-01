@@ -48,9 +48,19 @@
       1--44, 3--2, $[\ldots]$
   \end{quote}
   The comrade from Minsk is advised to $[\ldots]$.
+  
+  \section{Todo}
+  Explain the path finding. Why do we break when $maxEdges = (number of nodes in graph)$.
+  
+  Explain why we remove an edge if its weight is 0.
+  
+  Explain how we find the minimum cut.
+  
+  Include JGraphT jar files when we hand in.
 
   \section{Implementation details}
 
+	Note that we use JGraphT, which is a third-party library.
   We use a straighforward implemenation of Bellman--Quine's flow algorithm as described in Bronstein, \emph{Foundations of Algorithms}, chap.~6.
   We use Prim's algorithm to find an augmenting path and also implement the neat trick of flow by recomputing the inverse of the antisnail every 2nd iteration.\sidenote{%
     Replace by a description of what you actually do.
@@ -71,7 +81,7 @@
   }
   \begin{verbatim}
     class FlowEdge
-    {
+    { REPLACE!!
       Vertex from, to;
       GUISwingComponentFactory bar;
       Edge next, parent, foo;

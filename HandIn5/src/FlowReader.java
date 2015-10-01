@@ -4,13 +4,12 @@ import org.jgrapht.graph.*;
 
 import java.io.File;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class FlowReader {
 	public final ArrayList<Integer> vertices = new ArrayList<>();
 
 	private final Set<Integer> setA = new HashSet<>(  );
-	private final SimpleWeightedGraph<Integer, DirectedEdge> graph;
+	private final SimpleWeightedGraph<Integer, FlowEdge> graph;
 
 	private int totalFlow = 0;
 	private int maxEdges = 1;
@@ -20,8 +19,8 @@ public class FlowReader {
 		this.graph = parseFile( f );
 	}
 
-	public SimpleWeightedGraph<Integer, DirectedEdge> parseFile(File f) throws Exception {
-		SimpleWeightedGraph<Integer, DirectedEdge> g = new SimpleWeightedGraph<>( DirectedEdge.class );
+	public SimpleWeightedGraph<Integer, FlowEdge> parseFile(File f) throws Exception {
+		SimpleWeightedGraph<Integer, FlowEdge> g = new SimpleWeightedGraph<>( FlowEdge.class );
 
 		int verticeCount, edges;
 		try( Scanner s = new Scanner(f, "UTF-8") ) {
@@ -41,8 +40,7 @@ public class FlowReader {
 				int value = s.nextInt();
 				final Integer fromVertex = vertices.get(from);
 				final Integer toVertex = vertices.get(to);
-				g.addEdge( fromVertex, toVertex, new DirectedEdge<>( fromVertex, toVertex, value ) );
-				g.addEdge( toVertex, fromVertex, new DirectedEdge<>( toVertex, fromVertex, value ) );
+				g.addEdge( fromVertex, toVertex, new FlowEdge( fromVertex, toVertex, value ) );
 				edges--;
 			}
 		}
@@ -57,18 +55,18 @@ public class FlowReader {
 		Integer source = vertices.get( sourceIndex );
 		Integer sink = vertices.get( sinkIndex );
 
-		DirectedGraph<Integer, DirectedEdge> residualGraph = new DirectedMultigraph<>( DirectedEdge.class );
+		DirectedGraph<Integer, FlowEdge> residualGraph = new DirectedMultigraph<>( FlowEdge.class );
 		graph.vertexSet()
 		 	 .forEach( residualGraph::addVertex );
-		for (DirectedEdge<Integer> edge : graph.edgeSet())
+		for (FlowEdge edge : graph.edgeSet())
 		{
 			residualGraph.addEdge( edge.from, edge.to, edge );
-			residualGraph.addEdge( edge.to, edge.from, new DirectedEdge<>( edge.to, edge.from, edge.capacity ) );
+			residualGraph.addEdge( edge.to, edge.from, new FlowEdge( edge.to, edge.from, edge.capacity ) );
 		}
 
 		main:do
 		{
-			BellmanFordShortestPath<Integer, DirectedEdge> pathFinder = new BellmanFordShortestPath<>( residualGraph, source, maxEdges );
+			BellmanFordShortestPath<Integer, FlowEdge> pathFinder = new BellmanFordShortestPath<>( residualGraph, source, maxEdges );
 			while (pathFinder.getPathEdgeList( sink ) == null)
             {
 				if (maxEdges > numberOfVerticesInGraph) {
@@ -77,24 +75,24 @@ public class FlowReader {
                 pathFinder = new BellmanFordShortestPath<>( residualGraph, source, ++maxEdges );
 			}
 
-			final List<DirectedEdge> pathEdgeList = pathFinder.getPathEdgeList( sink );
+			final List<FlowEdge> shortestPath = pathFinder.getPathEdgeList( sink );
 
 			// Some edges can be infinite
-			final int min = pathEdgeList.stream()
-										.filter( e -> !e.isInfinite )
-										.min( (o1, o2) -> Double.compare( o1.weight(), o2.weight() ) )
-										.get()
-									 	.weight();
-			totalFlow += min;
-			for (DirectedEdge<Integer> forwardEdge : pathEdgeList)
+			final int bottleneck = shortestPath.stream()
+											   .filter( e -> !e.isInfinite )
+											   .min( (o1, o2) -> Double.compare( o1.weight(), o2.weight() ) )
+											   .get()
+											   .weight();
+			totalFlow += bottleneck;
+			for (FlowEdge forwardEdge : shortestPath)
             {
-				final DirectedEdge backwardsEdge = residualGraph.getEdge( forwardEdge.to, forwardEdge.from );
-				forwardEdge.flow += min;
+				final FlowEdge backwardsEdge = residualGraph.getEdge( forwardEdge.to, forwardEdge.from );
+				forwardEdge.flow += bottleneck;
 				if (forwardEdge.weight() == 0)
 				{
 					residualGraph.removeEdge( forwardEdge );
 				}
-				int flow = -min;
+				int flow = -bottleneck;
 				backwardsEdge.flow += flow;
 			}
 		} while (true);
@@ -108,7 +106,7 @@ public class FlowReader {
 		return totalFlow;
 	}
 
-	private void findMinimumCut(DirectedGraph<Integer, DirectedEdge> graph, Integer source)
+	private void findMinimumCut(DirectedGraph<Integer, FlowEdge> graph, Integer source)
 	{
 		if (setA.contains( source ))
 		{
@@ -119,7 +117,7 @@ public class FlowReader {
 		graph.outgoingEdgesOf( source )
 			 .stream()
 			 .filter( e -> (e.weight() >= 0 || e.isInfinite) && !setA.contains( e.to ) )
-			 .map( e -> (int) e.to ) // MUST do type cast!
+			 .map( e -> e.to )
 			 .forEach( i -> findMinimumCut( graph, i ) );
 	}
 
@@ -128,13 +126,14 @@ public class FlowReader {
 		System.out.println( f1.maxFlow( 0, 54 ) );
 	}
 
-    private static class DirectedEdge<V> {
+    private static class FlowEdge
+	{
         public final int capacity;
-        public final V from, to;
+        public final int from, to;
         public int flow;
 		public final boolean isInfinite;
 
-        public DirectedEdge(V from, V to, int capacity) {
+        public FlowEdge(int from, int to, int capacity) {
             this.from = from;
             this.to = to;
             this.capacity = capacity;

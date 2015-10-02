@@ -1,12 +1,17 @@
 \documentclass{tufte-handout}
+\usepackage[T2A,T1]{fontenc}
 \usepackage{amsmath}
 \usepackage[utf8]{inputenc}
 \usepackage{mathpazo}
 \usepackage{booktabs}
 \usepackage{microtype}
+\usepackage[russian,french,english]{babel}
+
+\newcommand{\tuple}[1]{\langle#1\rangle}
+\newcommand{\floor}[1]{\lfloor#1\rfloor}
+\newcommand{\ceil}[1]{\lceil#1\rceil}
 
 \pagestyle{empty}
-
 
 \title{Flow Report}
 \author{Evaristo Colomby, Martino Secchi, Søren Palmund and Ivan Naumovski}
@@ -25,68 +30,59 @@
   }
 
   We have analysed the possibilities of descreasing the capacities near Minsk.
-  Our analysis is summaries in the following table:\sidenote{%
-    Complete and correct the table.
-  }
+  Our analysis is summaried in the following table:
 
 \bigskip
   \begin{tabular}{rccc}\toprule
     Case & 4W--48	& 4W--49	& Effect on flow	\\\midrule
     1		& 30			& 20			& no change 		\\
     2		& 20 			& 30 			& no change 		\\
-    3		& 20			& 20			& $-10$ 			\\
+    3		& 20			& 20			& no change 			\\
     4		& 10			& 10			& $-20$				\\
-    5		& 20			& 10			& $-$				\\
-    6		& 10			& 20			& $-$				\\
-    7		& 30			& 10			& $-$				\\
-    8		& 10			& 30			& $-$				\\\bottomrule
+    5		& 20			& 10			& $-10$				\\
+    6		& 10			& 20			& $-10$				\\
+    7		& 30			& 10			& no change				\\
+    8		& 10			& 30			& no change				\\\bottomrule
   \end{tabular}
   \bigskip
-
-  In case 4, the new bottleneck becomes
-  \begin{quote}
-      1--44, 3--2, $[\ldots]$
-  \end{quote}
-  The comrade from Minsk is advised to $[\ldots]$.
   
-  \section{Todo}
-  Explain the path finding. Why do we break when $maxEdges = (number of nodes in graph)$.
-  
-  Explain why we remove an edge if its weight is 0.
-  
-  Explain how we find the minimum cut.
-  
-  Include JGraphT jar files when we hand in.
-
   \section{Implementation details}
 
-	Note that we use JGraphT, which is a third-party library.
-  We use a straighforward implemenation of Bellman--Quine's flow algorithm as described in Bronstein, \emph{Foundations of Algorithms}, chap.~6.
-  We use Prim's algorithm to find an augmenting path and also implement the neat trick of flow by recomputing the inverse of the antisnail every 2nd iteration.\sidenote{%
-    Replace by a description of what you actually do.
-  }
-
-  The running time is $[\ldots]$.
-
-  We have implemented each undirected edge in the input graph as a $[\ldots]$.
-  In the corresponding residual graph, the edge is represented by a $[\ldots]$.
+	Comrade, please take note that we have used JGraphT, which is a third-party library constructed by the capitalist devils in the US of A. We have however included this in our hand in. For the motherland!!
+	  We have implemented each undirected edge in the input as an edge in an undirected graph $G$. In the residual graph $G_f$ every undirected edge in $G$ is represented as two directed weighted edges going both ways.
   Our datatype for edge is this:
-  \sidenote{%
-    What I wrote here is complete nonsense, of course.
-    Replace by a description of your actual implementation---what \emph{did} you use?
-    A pair of directed edges?
-    A single undirected edges with a bit to see in which direction the flow goes?
-    As indicated, it makes sense to actually include your datatype for edge in the report.
-    Here, and in general, it makes sense to have written short and sweet code.
-  }
   \begin{verbatim}
     class FlowEdge
-    { REPLACE!!
-      Vertex from, to;
-      GUISwingComponentFactory bar;
-      Edge next, parent, foo;
+    {
+      int from, to, flow, capacity;
+      bool isInfinite;
+      
+      public int weight();
     }
   \end{verbatim}
-
-
+	
+	We use the Bellman-Ford shortest path algorithm to find an augmenting path $P$ in the residual graph. 
+	No path through the graph can use more edges than there are vertices in $G_f$.
+	We then find the bottleneck $b$ by finding the minimum capacity of all the participating edges in $P$.
+	We add $b$ to the total flow and update the flow on each edge in $P$.
+	If the weight of an edge $e$ is $0$ then we remove $e$ from $G_f$ so it won't be part of the next path. At the same time we update the flow on the corresponding backwards edge of $e$.
+	
+	\subsection{Finding the Minimum Cut}
+	When we have found the maximum flow $f$, we will attempt to find the minimum cut $(A, B)$.
+	
+	We start with $B = \emptyset$ and $A = \{ s \}$ since we know that $s$ is reachable from itself. 
+	We then check on the residual graph $G_f$ which vertices $v$ are reachable from $s$. For each $v$ we recursively add $v$ to $A$ and all the vertices that $v$ can reach. Which results in $B = V-A$.
+	
+	From this we can find and print all the edges that connect $A$ to $B$. We do this in time $O(|E|)$.
+  
+  
+  \subsection{Runtime}
+  The Bellman-Ford shortest path runs in $O(|V|\cdot|E|)$. Our algorithm terminates after at most $C$ iterations where $C = \sum_{e \text{ out of } s}c_e$.
+  
+  The total runtime of our implementation is therefore $O(|V|\cdot|E|\cdot C)$.
+  
+  \bigskip
+  \noindent
+  For the motherland, \foreignlanguage{russian}{товарищ}!
+  
 \end{document}

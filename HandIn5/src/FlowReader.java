@@ -64,27 +64,24 @@ public class FlowReader {
 			residualGraph.addEdge( edge.to, edge.from, new FlowEdge( edge.to, edge.from, edge.capacity ) );
 		}
 
-		main:do
+		do
 		{
-			BellmanFordShortestPath<Integer, FlowEdge> pathFinder = new BellmanFordShortestPath<>( residualGraph, source, maxEdges );
-			while (pathFinder.getPathEdgeList( sink ) == null)
-            {
-				if (maxEdges > numberOfVerticesInGraph) {
-					break main; // We can't visit the same node twice
-				}
-                pathFinder = new BellmanFordShortestPath<>( residualGraph, source, ++maxEdges );
+			// O(|V||E|)
+			BellmanFordShortestPath<Integer, FlowEdge> pathFinder = new BellmanFordShortestPath<>( residualGraph, source, numberOfVerticesInGraph );
+			final List<FlowEdge> shortestPath = pathFinder.getPathEdgeList( sink );
+			if (shortestPath == null)
+			{
+				break;
 			}
 
-			final List<FlowEdge> shortestPath = pathFinder.getPathEdgeList( sink );
-
 			// Some edges can be infinite
-			final int bottleneck = shortestPath.stream()
+			final int bottleneck = shortestPath.stream() // O(|V|)
 											   .filter( e -> !e.isInfinite )
 											   .min( (o1, o2) -> Double.compare( o1.weight(), o2.weight() ) )
 											   .get()
 											   .weight();
 			totalFlow += bottleneck;
-			for (FlowEdge forwardEdge : shortestPath)
+			for (FlowEdge forwardEdge : shortestPath) // O(|V|)
             {
 				final FlowEdge backwardsEdge = getBackwardsEdge( residualGraph, forwardEdge );
 				forwardEdge.flow += bottleneck;
@@ -95,12 +92,12 @@ public class FlowReader {
 				int flow = -bottleneck;
 				backwardsEdge.flow += flow;
 			}
-		} while (true);
+		} while (true); // O(mC)
 
 		findMinimumCut( residualGraph, source );
 		setA.forEach( i -> graph.edgesOf( i )
 								.stream()
-								.filter( e -> !(setA.contains( e.from ) && setA.contains( e.to )) ) // Where both end are NOT in A*
+								.filter( e -> !(setA.contains( e.from ) && setA.contains( e.to )) ) // Where both ends are NOT in A*
 								.forEach( e -> System.out.printf( "%d %d %d\n", e.from, e.to, e.capacity ) ) );
 
 		return totalFlow;
@@ -133,8 +130,9 @@ public class FlowReader {
 	}
 
 	public static void main(String[] args) throws Exception {
-		FlowReader f1 = new FlowReader( new File( "flow_data/rail.txt" ) );
-		System.out.println( f1.maxFlow( 0, 54 ) );
+		FlowReader f1 = new FlowReader( new File( "flow_data/proof.txt" ) );
+		final Integer sink = f1.vertices.get( f1.vertices.size() - 1 );
+		System.out.println( f1.maxFlow( 0, sink ) );
 	}
 
     private static class FlowEdge

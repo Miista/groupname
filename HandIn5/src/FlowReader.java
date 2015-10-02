@@ -86,7 +86,7 @@ public class FlowReader {
 			totalFlow += bottleneck;
 			for (FlowEdge forwardEdge : shortestPath)
             {
-				final FlowEdge backwardsEdge = residualGraph.getEdge( forwardEdge.to, forwardEdge.from );
+				final FlowEdge backwardsEdge = getBackwardsEdge( residualGraph, forwardEdge );
 				forwardEdge.flow += bottleneck;
 				if (forwardEdge.weight() == 0)
 				{
@@ -104,6 +104,17 @@ public class FlowReader {
 								.forEach( e -> System.out.printf( "%d %d %d\n", e.from, e.to, e.capacity ) ) );
 
 		return totalFlow;
+	}
+
+	private FlowEdge getBackwardsEdge(DirectedGraph<Integer, FlowEdge> graph, FlowEdge edge)
+	{
+		FlowEdge backwardsEdge = graph.getEdge( edge.to, edge.from );
+		if (backwardsEdge == null)
+		{
+			backwardsEdge = new FlowEdge( edge.from, edge.to, edge.capacity );
+			graph.addEdge( edge.to, edge.from, backwardsEdge );
+		}
+		return backwardsEdge;
 	}
 
 	private void findMinimumCut(DirectedGraph<Integer, FlowEdge> graph, Integer source)
@@ -128,21 +139,21 @@ public class FlowReader {
 
     private static class FlowEdge
 	{
-        public final int capacity;
-        public final int from, to;
-        public int flow;
+		public final int capacity;
+		public final int from, to;
+		public int flow;
 		public final boolean isInfinite;
 
-        public FlowEdge(int from, int to, int capacity) {
-            this.from = from;
-            this.to = to;
-            this.capacity = capacity;
-            this.flow = 0;
+		public FlowEdge(int from, int to, int capacity) {
+			this.from = from;
+			this.to = to;
+			this.capacity = capacity;
+			this.flow = 0;
 			this.isInfinite = capacity == -1;
-        }
+		}
 
-        public int weight() {
-            return capacity-flow;
-        }
-    }
+		public int weight() {
+			return capacity-flow;
+		}
+	}
 }
